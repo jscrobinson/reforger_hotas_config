@@ -1,48 +1,48 @@
 // Arma Reforger HOTAS Configurator
 // ====================================
 
-// Action definitions with sensible FilterPreset defaults
+// Action definitions with sensible FilterPreset defaults and hints
 const ACTIONS = [
-    { name: 'PerformAction', filterPreset: 'pressed' },
-    { name: 'SelectAction', filterPreset: 'next' },  // Special case - multiple inputs in original
-    { name: 'CharacterNextWeapon', filterPreset: 'click' },
-    { name: 'CharacterFire', filterPreset: 'hold' },
-    { name: 'CharacterNextFireMode', filterPreset: 'click' },
-    { name: 'CharacterNextMuzzle', filterPreset: 'click' },
-    { name: 'GadgetMap', filterPreset: 'select' },
-    { name: 'HelicopterCollectiveIncrease', filterPreset: 'up' },
-    { name: 'HelicopterCollectiveDecrease', filterPreset: 'down' },
-    { name: 'HelicopterAntiTorqueLeft', filterPreset: 'left' },
-    { name: 'HelicopterAntiTorqueRight', filterPreset: 'right' },
-    { name: 'HelicopterCyclicForward', filterPreset: 'forward' },
-    { name: 'HelicopterCyclicBack', filterPreset: 'back' },
-    { name: 'HelicopterCyclicLeft', filterPreset: 'left' },
-    { name: 'HelicopterCyclicRight', filterPreset: 'right' },
-    { name: 'HelicopterWheelBrake', filterPreset: 'pressed' },
-    { name: 'HelicopterWheelBrakePersistent', filterPreset: 'pressed' },
-    { name: 'HelicopterAutohoverToggle', filterPreset: 'click' },
-    { name: 'HelicopterLightsTaxiToggle', filterPreset: 'toggle' },
-    { name: 'HelicopterLightsLandingToggle', filterPreset: 'toggle' },
-    { name: 'WeaponToggleSightsIllumination', filterPreset: 'click' },
-    { name: 'WeaponSwitchOptics', filterPreset: 'click' },
-    { name: 'TurretFire', filterPreset: 'hold' },
-    { name: 'TurretReload', filterPreset: 'click' },
-    { name: 'TurretNextWeapon', filterPreset: 'click' },
-    { name: 'TurretNextFireMode', filterPreset: 'click' },
-    { name: 'TurretADS', filterPreset: 'click' },
-    { name: 'TurretADSHold', filterPreset: 'hold' },
-    { name: 'TurretRotateLeft', filterPreset: 'left' },
-    { name: 'TurretRotateRight', filterPreset: 'right' },
-    { name: 'TurretAimUp', filterPreset: 'up' },
-    { name: 'TurretAimDown', filterPreset: 'down' },
-    { name: 'TurretAimLeft', filterPreset: 'left' },
-    { name: 'TurretAimRight', filterPreset: 'right' },
-    { name: 'VONDirectToggle', filterPreset: 'click' },
-    { name: 'VONChannel', filterPreset: 'hold' },
-    { name: 'GetOut', filterPreset: 'click' },
-    { name: 'JumpOut', filterPreset: 'click' },
-    { name: 'HelicopterEngineStart', filterPreset: 'hold' },
-    { name: 'HelicopterEngineStop', filterPreset: 'click' }
+    { name: 'PerformAction', filterPreset: 'pressed', hint: 'Interact with objects/doors', hardware: 'button', importance: 'important' },
+    { name: 'SelectAction', filterPreset: 'next', hint: 'Open action menu', hardware: 'button', importance: 'important' },
+    { name: 'CharacterNextWeapon', filterPreset: 'click', hint: 'Switch to next weapon', hardware: 'hat', importance: 'important' },
+    { name: 'CharacterFire', filterPreset: 'hold', hint: 'Fire primary weapon', hardware: 'trigger', importance: 'critical' },
+    { name: 'CharacterNextFireMode', filterPreset: 'click', hint: 'Change fire mode (single/burst/auto)', hardware: 'button', importance: 'important' },
+    { name: 'CharacterNextMuzzle', filterPreset: 'click', hint: 'Select next muzzle/barrel', hardware: 'button', importance: 'optional' },
+    { name: 'GadgetMap', filterPreset: 'select', hint: 'Open tactical map', hardware: 'button', importance: 'important' },
+    { name: 'HelicopterCollectiveIncrease', filterPreset: 'up', hint: 'Increase altitude (raise collective)', hardware: 'throttle', importance: 'critical' },
+    { name: 'HelicopterCollectiveDecrease', filterPreset: 'down', hint: 'Decrease altitude (lower collective)', hardware: 'throttle', importance: 'critical' },
+    { name: 'HelicopterAntiTorqueLeft', filterPreset: 'left', hint: 'Yaw left (left pedal)', hardware: 'pedals', importance: 'critical' },
+    { name: 'HelicopterAntiTorqueRight', filterPreset: 'right', hint: 'Yaw right (right pedal)', hardware: 'pedals', importance: 'critical' },
+    { name: 'HelicopterCyclicForward', filterPreset: 'forward', hint: 'Pitch nose down (move forward)', hardware: 'stick', importance: 'critical' },
+    { name: 'HelicopterCyclicBack', filterPreset: 'back', hint: 'Pitch nose up (slow down)', hardware: 'stick', importance: 'critical' },
+    { name: 'HelicopterCyclicLeft', filterPreset: 'left', hint: 'Roll left (move sideways left)', hardware: 'stick', importance: 'critical' },
+    { name: 'HelicopterCyclicRight', filterPreset: 'right', hint: 'Roll right (move sideways right)', hardware: 'stick', importance: 'critical' },
+    { name: 'HelicopterWheelBrake', filterPreset: 'pressed', hint: 'Apply brakes (momentary)', hardware: 'pedals', importance: 'important' },
+    { name: 'HelicopterWheelBrakePersistent', filterPreset: 'pressed', hint: 'Parking brake (toggle)', hardware: 'button', importance: 'important' },
+    { name: 'HelicopterAutohoverToggle', filterPreset: 'click', hint: 'Auto-hover stabilization', hardware: 'button', importance: 'important' },
+    { name: 'HelicopterLightsTaxiToggle', filterPreset: 'toggle', hint: 'Taxi lights (ground operations)', hardware: 'switch', importance: 'optional' },
+    { name: 'HelicopterLightsLandingToggle', filterPreset: 'toggle', hint: 'Landing lights (approach)', hardware: 'switch', importance: 'optional' },
+    { name: 'WeaponToggleSightsIllumination', filterPreset: 'click', hint: 'Toggle reticle illumination', hardware: 'button', importance: 'optional' },
+    { name: 'WeaponSwitchOptics', filterPreset: 'click', hint: 'Change zoom/magnification', hardware: 'button', importance: 'important' },
+    { name: 'TurretFire', filterPreset: 'hold', hint: 'Fire turret weapon', hardware: 'trigger', importance: 'important' },
+    { name: 'TurretReload', filterPreset: 'click', hint: 'Reload turret weapon', hardware: 'button', importance: 'important' },
+    { name: 'TurretNextWeapon', filterPreset: 'click', hint: 'Cycle turret weapons', hardware: 'hat', importance: 'important' },
+    { name: 'TurretNextFireMode', filterPreset: 'click', hint: 'Change turret fire mode', hardware: 'button', importance: 'optional' },
+    { name: 'TurretADS', filterPreset: 'click', hint: 'Aim down sights (toggle)', hardware: 'button', importance: 'optional' },
+    { name: 'TurretADSHold', filterPreset: 'hold', hint: 'Aim down sights (hold)', hardware: 'button', importance: 'optional' },
+    { name: 'TurretRotateLeft', filterPreset: 'left', hint: 'Rotate turret left', hardware: 'stick', importance: 'important' },
+    { name: 'TurretRotateRight', filterPreset: 'right', hint: 'Rotate turret right', hardware: 'stick', importance: 'important' },
+    { name: 'TurretAimUp', filterPreset: 'up', hint: 'Elevate turret up', hardware: 'stick', importance: 'important' },
+    { name: 'TurretAimDown', filterPreset: 'down', hint: 'Depress turret down', hardware: 'stick', importance: 'important' },
+    { name: 'TurretAimLeft', filterPreset: 'left', hint: 'Fine aim left', hardware: 'stick', importance: 'optional' },
+    { name: 'TurretAimRight', filterPreset: 'right', hint: 'Fine aim right', hardware: 'stick', importance: 'optional' },
+    { name: 'VONDirectToggle', filterPreset: 'click', hint: 'Toggle proximity voice chat', hardware: 'button', importance: 'important' },
+    { name: 'VONChannel', filterPreset: 'hold', hint: 'Push-to-talk radio', hardware: 'button', importance: 'important' },
+    { name: 'GetOut', filterPreset: 'click', hint: 'Exit vehicle safely', hardware: 'button', importance: 'important' },
+    { name: 'JumpOut', filterPreset: 'click', hint: 'Emergency eject (dangerous!)', hardware: 'button', importance: 'optional' },
+    { name: 'HelicopterEngineStart', filterPreset: 'hold', hint: 'Start engine and rotors', hardware: 'button', importance: 'critical' },
+    { name: 'HelicopterEngineStop', filterPreset: 'click', hint: 'Stop engine and rotors', hardware: 'button', importance: 'critical' }
 ];
 
 // State management
@@ -75,6 +75,9 @@ function init() {
         configFileInput: document.getElementById('config-file-input'),
         currentActionSection: document.getElementById('current-action-section'),
         currentActionName: document.getElementById('current-action-name'),
+        actionDescription: document.getElementById('action-description'),
+        importanceIndicator: document.getElementById('importance-indicator'),
+        hardwareHint: document.getElementById('hardware-hint'),
         inputDetected: document.getElementById('input-detected'),
         confirmationPrompt: document.getElementById('confirmation-prompt'),
         hatModeCheckbox: document.getElementById('hat-mode-checkbox'),
@@ -498,6 +501,22 @@ function updateCurrentAction() {
     if (state.currentActionIndex >= 0 && state.currentActionIndex < state.actions.length) {
         const action = state.actions[state.currentActionIndex];
         elements.currentActionName.textContent = formatActionName(action.name);
+
+        // Update action hint information
+        elements.actionDescription.textContent = action.hint || '-';
+
+        // Update importance indicator
+        elements.importanceIndicator.className = 'importance-indicator';
+        if (action.importance) {
+            elements.importanceIndicator.classList.add(action.importance);
+        }
+
+        // Update hardware hint
+        elements.hardwareHint.textContent = action.hardware || 'button';
+        elements.hardwareHint.className = 'hardware-hint';
+        if (action.hardware) {
+            elements.hardwareHint.classList.add(action.hardware);
+        }
 
         // Reset input detection display
         if (action.binding) {

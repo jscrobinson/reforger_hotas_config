@@ -450,7 +450,121 @@ header h1 {
     font-size: 1.8em;
     font-weight: 700;
     color: #1e3c72;
+    margin-bottom: 10px;
+}
+
+/* Action Info and Hints */
+.action-info {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
     margin-bottom: 15px;
+    padding: 12px 20px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    border-left: 4px solid #ddd;
+    flex-wrap: wrap;
+}
+
+.importance-indicator {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.importance-indicator.critical {
+    background: #e53935;
+    box-shadow: 0 0 8px rgba(229, 57, 53, 0.4);
+}
+
+.importance-indicator.important {
+    background: #FFC107;
+    box-shadow: 0 0 8px rgba(255, 193, 7, 0.4);
+}
+
+.importance-indicator.optional {
+    background: #4CAF50;
+    box-shadow: 0 0 8px rgba(76, 175, 80, 0.4);
+}
+
+.action-description {
+    font-size: 1.05em;
+    color: #333;
+    font-weight: 500;
+    text-align: center;
+}
+
+.hardware-hint {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    background: #e3f2fd;
+    border: 1px solid #90caf9;
+    border-radius: 12px;
+    font-size: 0.85em;
+    color: #1565c0;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.hardware-hint::before {
+    content: '';
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.hardware-hint.stick::before {
+    content: '🕹️';
+    font-size: 14px;
+}
+
+.hardware-hint.throttle::before {
+    content: '⚡';
+    font-size: 14px;
+}
+
+.hardware-hint.pedals::before {
+    content: '👟';
+    font-size: 14px;
+}
+
+.hardware-hint.trigger::before {
+    content: '🎯';
+    font-size: 14px;
+}
+
+.hardware-hint.button::before {
+    content: '🔘';
+    font-size: 14px;
+}
+
+.hardware-hint.hat::before {
+    content: '🧭';
+    font-size: 14px;
+}
+
+.hardware-hint.switch::before {
+    content: '🔀';
+    font-size: 14px;
+}
+
+@media (max-width: 768px) {
+    .action-info {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .action-description {
+        font-size: 0.95em;
+    }
 }
 
 .action-prompt {

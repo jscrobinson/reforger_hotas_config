@@ -454,9 +454,10 @@ header h1 {
 }
 
 .action-prompt {
-    font-size: 1.1em;
+    font-size: 1.2em;
     color: #666;
     margin-bottom: 10px;
+    font-weight: 600;
 }
 
 .action-hint {
@@ -466,17 +467,110 @@ header h1 {
     margin-bottom: 20px;
 }
 
-.input-detected {
-    min-height: 40px;
-    font-size: 1.2em;
-    font-weight: 600;
-    color: #4CAF50;
-    margin-bottom: 20px;
-    cursor: help;
+.input-detection-container {
+    margin: 25px 0;
+    min-height: 120px;
 }
 
-.input-detected:hover {
-    color: #388E3C;
+.input-detected {
+    min-height: 80px;
+    padding: 20px;
+    font-size: 1.4em;
+    font-weight: 700;
+    color: #4CAF50;
+    background: #e8f5e9;
+    border: 3px solid #4CAF50;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(76, 175, 80, 0.2);
+}
+
+.input-detected.has-input {
+    animation: inputDetected 0.5s ease;
+    background: #c8e6c9;
+    border-color: #388E3C;
+    color: #1b5e20;
+    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
+}
+
+.waiting-message {
+    color: #999;
+    font-size: 0.9em;
+    font-weight: 500;
+    font-style: italic;
+}
+
+@keyframes inputDetected {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.confirmation-prompt {
+    background: #fff3e0;
+    border: 3px solid #FF9800;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    animation: pulse-confirm 1.5s ease-in-out infinite;
+    box-shadow: 0 4px 12px rgba(255, 152, 0, 0.3);
+}
+
+@keyframes pulse-confirm {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 4px 12px rgba(255, 152, 0, 0.3);
+    }
+    50% {
+        transform: scale(1.02);
+        box-shadow: 0 6px 16px rgba(255, 152, 0, 0.5);
+    }
+}
+
+.confirm-icon {
+    font-size: 3em;
+    color: #4CAF50;
+    margin-bottom: 10px;
+    animation: bounce 1s ease infinite;
+}
+
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+.confirm-text {
+    font-size: 1.3em;
+    font-weight: 700;
+    color: #e65100;
+}
+
+.confirm-text kbd {
+    display: inline-block;
+    padding: 8px 16px;
+    background: #FF9800;
+    color: white;
+    border-radius: 6px;
+    font-family: 'Courier New', monospace;
+    font-size: 1.1em;
+    font-weight: 700;
+    margin: 0 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    border: 2px solid #F57C00;
 }
 
 .hat-mode-control {

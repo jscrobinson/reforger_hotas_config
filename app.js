@@ -76,6 +76,7 @@ function init() {
         currentActionSection: document.getElementById('current-action-section'),
         currentActionName: document.getElementById('current-action-name'),
         inputDetected: document.getElementById('input-detected'),
+        confirmationPrompt: document.getElementById('confirmation-prompt'),
         hatModeCheckbox: document.getElementById('hat-mode-checkbox'),
         skipActionBtn: document.getElementById('skip-action-btn'),
         clearActionBtn: document.getElementById('clear-action-btn'),
@@ -276,8 +277,12 @@ function assignInput(input) {
 
         // Show the input with a helpful description
         const description = describeInput(input);
-        elements.inputDetected.textContent = input + ' - Press SPACE to accept';
+        elements.inputDetected.innerHTML = `<strong>${input}</strong>`;
         elements.inputDetected.title = description;
+        elements.inputDetected.classList.add('has-input');
+
+        // Show confirmation prompt
+        elements.confirmationPrompt.style.display = 'block';
 
         // Set cooldown to prevent multiple rapid detections
         state.inputCooldown = true;
@@ -479,7 +484,9 @@ function clearCurrentActionBinding() {
     if (state.currentActionIndex >= 0 && state.currentActionIndex < state.actions.length) {
         state.actions[state.currentActionIndex].binding = null;
         state.pendingInput = null;  // Clear any pending input
-        elements.inputDetected.textContent = '';
+        elements.inputDetected.innerHTML = '<div class="waiting-message">Waiting for input...</div>';
+        elements.inputDetected.classList.remove('has-input');
+        elements.confirmationPrompt.style.display = 'none';
         state.inputCooldown = false;
         resetGamepadBaseline();  // Reset baseline after clearing
         renderActionsList();
@@ -491,7 +498,19 @@ function updateCurrentAction() {
     if (state.currentActionIndex >= 0 && state.currentActionIndex < state.actions.length) {
         const action = state.actions[state.currentActionIndex];
         elements.currentActionName.textContent = formatActionName(action.name);
-        elements.inputDetected.textContent = action.binding || '';
+
+        // Reset input detection display
+        if (action.binding) {
+            elements.inputDetected.innerHTML = `<strong>${action.binding}</strong>`;
+            elements.inputDetected.classList.add('has-input');
+        } else {
+            elements.inputDetected.innerHTML = '<div class="waiting-message">Waiting for input...</div>';
+            elements.inputDetected.classList.remove('has-input');
+        }
+
+        // Hide confirmation prompt when changing actions
+        elements.confirmationPrompt.style.display = 'none';
+
         updateProgress();
     }
 }

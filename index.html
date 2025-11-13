@@ -130,9 +130,17 @@
                 <h2>Current Action</h2>
                 <div class="action-display">
                     <div class="action-name" id="current-action-name">-</div>
-                    <div class="action-prompt">Press any button or move any axis, then press SPACE to confirm</div>
+                    <div class="action-prompt">Press any button or move any axis</div>
                     <div class="action-hint">Use ↑↓ arrows or click to navigate actions • Enable HAT Mode for difficult HAT switches</div>
-                    <div class="input-detected" id="input-detected"></div>
+                    <div class="input-detection-container">
+                        <div class="input-detected" id="input-detected">
+                            <div class="waiting-message">Waiting for input...</div>
+                        </div>
+                        <div class="confirmation-prompt" id="confirmation-prompt" style="display: none;">
+                            <div class="confirm-icon">✓</div>
+                            <div class="confirm-text">Press <kbd>SPACE</kbd> to confirm</div>
+                        </div>
+                    </div>
                     <div class="hat-mode-control">
                         <label class="hat-mode-label">
                             <input type="checkbox" id="hat-mode-checkbox">

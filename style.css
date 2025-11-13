@@ -77,6 +77,16 @@ header h1 {
     box-shadow: 0 4px 8px rgba(88, 101, 242, 0.4);
 }
 
+.community-link.github-link {
+    background: #24292e;
+    box-shadow: 0 2px 4px rgba(36, 41, 46, 0.3);
+}
+
+.community-link.github-link:hover {
+    background: #1a1e22;
+    box-shadow: 0 4px 8px rgba(36, 41, 46, 0.4);
+}
+
 .community-link .icon {
     font-size: 1.3em;
 }

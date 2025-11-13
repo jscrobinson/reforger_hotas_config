@@ -34,6 +34,85 @@ header h1 {
     opacity: 0.9;
 }
 
+/* Community Section */
+.community-section {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.community-box h3 {
+    font-size: 1.3em;
+    margin-bottom: 15px;
+    color: #1e3c72;
+    text-align: center;
+}
+
+.community-links {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    align-items: center;
+}
+
+.community-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 24px;
+    background: #5865F2;
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(88, 101, 242, 0.3);
+}
+
+.community-link:hover {
+    background: #4752C4;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(88, 101, 242, 0.4);
+}
+
+.community-link .icon {
+    font-size: 1.3em;
+}
+
+.server-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 20px;
+    background: #f0f4f8;
+    border-radius: 6px;
+    color: #333;
+    text-align: center;
+    border-left: 4px solid #4CAF50;
+}
+
+.server-info .icon {
+    font-size: 1.3em;
+}
+
+.server-info strong {
+    color: #1e3c72;
+}
+
+@media (max-width: 768px) {
+    .community-links {
+        width: 100%;
+    }
+
+    .community-link,
+    .server-info {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
 .status-section {
     background: white;
     border-radius: 10px;

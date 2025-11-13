@@ -893,3 +893,61 @@ header h1 {
     margin-top: 20px;
     margin-bottom: 20px;
 }
+
+/* Footer */
+.page-footer {
+    text-align: center;
+    padding: 30px 20px;
+    margin-top: 40px;
+    border-top: 1px solid #e0e0e0;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
+
+.page-footer p {
+    margin: 0;
+    color: #555;
+    font-size: 0.9em;
+}
+
+.page-footer a {
+    color: #1e3c72;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+.page-footer a:hover {
+    color: #2a5298;
+    text-decoration: underline;
+}
+
+.version-separator {
+    margin: 0 10px;
+    color: #999;
+}
+
+.version-info {
+    color: #666;
+}
+
+.version-info code {
+    background: #fff;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.85em;
+    color: #d63384;
+    border: 1px solid #e0e0e0;
+}
+
+@media (max-width: 600px) {
+    .page-footer p {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .version-separator {
+        display: none;
+    }
+}

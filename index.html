@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arma Reforger HOTAS Configurator</title>
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Google AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX"
+     crossorigin="anonymous"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Arma Reforger HOTAS Configurator</h1>
+            <p class="subtitle">Configure your joystick inputs for Arma Reforger</p>
+        </header>
+
+        <!-- Ad: Top Banner -->
+        <div class="ad-container">
+            <ins class="adsbygoogle"
+                 style="display:block"
+                 data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+                 data-ad-slot="1234567890"
+                 data-ad-format="auto"
+                 data-full-width-responsive="true"></ins>
+            <script>
+                 (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+        </div>
+
+        <div class="status-section">
+            <div class="joystick-status">
+                <h2>Connected Joysticks</h2>
+                <div id="joystick-list">
+                    <p class="no-joysticks">No joysticks detected. Connect a joystick and press any button.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="config-section">
+            <div class="config-controls">
+                <button id="load-config-btn" class="btn btn-secondary">Load Existing Config</button>
+                <input type="file" id="config-file-input" accept=".conf" style="display: none;">
+                <button id="start-config-btn" class="btn btn-primary">Start Configuring</button>
+                <button id="download-config-btn" class="btn btn-success" disabled>Download Config</button>
+            </div>
+            <div class="save-location-hint">
+                <p><strong>Save Location:</strong> %USERPROFILE%\Documents\My Games\ArmaReforger\profile\.save\settings\customInputConfigs</p>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="current-action-section" id="current-action-section" style="display: none;">
+                <h2>Current Action</h2>
+                <div class="action-display">
+                    <div class="action-name" id="current-action-name">-</div>
+                    <div class="action-prompt">Press any button or move any axis, then press SPACE to confirm</div>
+                    <div class="action-hint">Use ↑↓ arrows or click to navigate actions • Enable HAT Mode for difficult HAT switches</div>
+                    <div class="input-detected" id="input-detected"></div>
+                    <div class="hat-mode-control">
+                        <label class="hat-mode-label">
+                            <input type="checkbox" id="hat-mode-checkbox">
+                            <span>HAT Mode (simplified axis detection)</span>
+                        </label>
+                    </div>
+                    <div class="action-controls">
+                        <button id="skip-action-btn" class="btn btn-secondary">Skip</button>
+                        <button id="clear-action-btn" class="btn btn-warning">Clear Binding</button>
+                        <button id="resume-btn" class="btn btn-primary" style="display: none;">Resume from Action <span id="resume-action-number"></span></button>
+                    </div>
+                </div>
+                <div class="progress">
+                    <div class="progress-text" id="progress-text">0 / 0</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="actions-list-section">
+                <h2>Actions</h2>
+                <div class="filter-controls">
+                    <button class="filter-btn active" data-filter="all">All (<span id="count-all">0</span>)</button>
+                    <button class="filter-btn" data-filter="configured">Configured (<span id="count-configured">0</span>)</button>
+                    <button class="filter-btn" data-filter="unconfigured">Unconfigured (<span id="count-unconfigured">0</span>)</button>
+                </div>
+                <div id="actions-list" class="actions-list">
+                    <!-- Actions will be populated here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Ad: Bottom Banner -->
+        <div class="ad-container ad-bottom">
+            <ins class="adsbygoogle"
+                 style="display:block"
+                 data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+                 data-ad-slot="0987654321"
+                 data-ad-format="auto"
+                 data-full-width-responsive="true"></ins>
+            <script>
+                 (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

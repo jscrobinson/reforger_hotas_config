@@ -27,10 +27,10 @@ Open `index.html` and replace the placeholder codes:
 
 Find:
 ```html
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX"
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8117946503724556"
 ```
 
-Replace `ca-pub-XXXXXXXXXXXXXXXX` with your actual Publisher ID.
+Replace `ca-pub-8117946503724556` with your actual Publisher ID.
 
 ### Replace Ad Slot IDs
 
@@ -38,14 +38,14 @@ There are two ad units in the file:
 
 **Top Banner Ad (Line 24):**
 ```html
-data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+data-ad-client="ca-pub-8117946503724556"
 data-ad-slot="1234567890"
 ```
 
 **Bottom Banner Ad (Line 99):**
 ```html
-data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
-data-ad-slot="0987654321"
+data-ad-client="ca-pub-8117946503724556"
+data-ad-slot="8517600527"
 ```
 
 #### How to get Ad Slot IDs:
@@ -91,7 +91,7 @@ Both are responsive and will adapt to different screen sizes.
 
 ### Ads not showing?
 
-- Check that you replaced ALL instances of `ca-pub-XXXXXXXXXXXXXXXX`
+- Check that you replaced ALL instances of `ca-pub-8117946503724556`
 - Verify your AdSense account is approved and active
 - Make sure you're not using an ad blocker
 - Check browser console for errors

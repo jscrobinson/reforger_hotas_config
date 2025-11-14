@@ -152,6 +152,23 @@
                             <span>HAT Mode (simplified axis detection)</span>
                         </label>
                     </div>
+
+                    <!-- Joystick Visualization -->
+                    <div class="joystick-visualization" id="joystick-visualization">
+                        <div class="viz-header">
+                            <h3>Live Input Monitor</h3>
+                            <span class="viz-device-name" id="viz-device-name">No device detected</span>
+                        </div>
+                        <div class="viz-content">
+                            <div class="viz-axes" id="viz-axes">
+                                <!-- Axes will be populated dynamically -->
+                            </div>
+                            <div class="viz-buttons" id="viz-buttons">
+                                <!-- Buttons will be populated dynamically -->
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="action-controls">
                         <button id="skip-action-btn" class="btn btn-secondary">Skip</button>
                         <button id="clear-action-btn" class="btn btn-warning">Clear Binding</button>

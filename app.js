@@ -90,7 +90,10 @@ function init() {
         actionsList: document.getElementById('actions-list'),
         countAll: document.getElementById('count-all'),
         countConfigured: document.getElementById('count-configured'),
-        countUnconfigured: document.getElementById('count-unconfigured')
+        countUnconfigured: document.getElementById('count-unconfigured'),
+        vizDeviceName: document.getElementById('viz-device-name'),
+        vizAxes: document.getElementById('viz-axes'),
+        vizButtons: document.getElementById('viz-buttons')
     };
 
     // Event listeners
@@ -142,17 +145,21 @@ function init() {
 function pollGamepads() {
     const gamepads = navigator.getGamepads();
     let hasGamepads = false;
+    let firstGamepad = null;
 
     for (let i = 0; i < gamepads.length; i++) {
         const gamepad = gamepads[i];
         if (gamepad) {
             hasGamepads = true;
+            if (!firstGamepad) firstGamepad = gamepad;
+
             if (!state.connectedGamepads[i]) {
                 state.connectedGamepads[i] = {
                     id: gamepad.id,
                     index: i
                 };
                 renderJoystickList();
+                initializeVisualization(gamepad);
             }
 
             // Store current state for change detection
@@ -167,7 +174,99 @@ function pollGamepads() {
         renderJoystickList();
     }
 
+    // Update visualization with first connected gamepad
+    if (firstGamepad) {
+        updateVisualization(firstGamepad);
+    }
+
     requestAnimationFrame(pollGamepads);
+}
+
+// Joystick Visualization
+function initializeVisualization(gamepad) {
+    if (!gamepad) return;
+
+    // Update device name
+    elements.vizDeviceName.textContent = gamepad.id;
+
+    // Create axes visualizations
+    elements.vizAxes.innerHTML = '';
+    for (let i = 0; i < gamepad.axes.length; i++) {
+        const axisDiv = document.createElement('div');
+        axisDiv.className = 'viz-axis';
+        axisDiv.innerHTML = `
+            <span class="viz-axis-label">Axis ${i}</span>
+            <div class="viz-axis-bar-container">
+                <div class="viz-axis-center-line"></div>
+                <div class="viz-axis-bar" data-axis="${i}"></div>
+            </div>
+            <span class="viz-axis-value" data-axis-value="${i}">0.00</span>
+        `;
+        elements.vizAxes.appendChild(axisDiv);
+    }
+
+    // Create button visualizations
+    elements.vizButtons.innerHTML = '';
+    for (let i = 0; i < gamepad.buttons.length; i++) {
+        const buttonDiv = document.createElement('div');
+        buttonDiv.className = 'viz-button';
+        buttonDiv.setAttribute('data-button', i);
+        buttonDiv.textContent = i;
+        elements.vizButtons.appendChild(buttonDiv);
+    }
+}
+
+function updateVisualization(gamepad) {
+    if (!gamepad) return;
+
+    // Update axes
+    const axisBars = elements.vizAxes.querySelectorAll('.viz-axis-bar');
+    const axisValues = elements.vizAxes.querySelectorAll('.viz-axis-value');
+
+    gamepad.axes.forEach((axisValue, index) => {
+        const bar = axisBars[index];
+        const valueSpan = axisValues[index];
+
+        if (bar && valueSpan) {
+            // Calculate bar position (axis values range from -1 to 1)
+            // Map to 0-100% where 50% is center
+            const percentage = ((axisValue + 1) / 2) * 100;
+
+            // Position the bar from center to current position
+            if (axisValue < 0) {
+                // Negative values: bar goes from current position to center
+                bar.style.left = `${percentage}%`;
+                bar.style.width = `${50 - percentage}%`;
+            } else {
+                // Positive values: bar goes from center to current position
+                bar.style.left = '50%';
+                bar.style.width = `${percentage - 50}%`;
+            }
+
+            // Highlight active axes (moved significantly from center)
+            if (Math.abs(axisValue) > 0.1) {
+                bar.classList.add('active');
+            } else {
+                bar.classList.remove('active');
+            }
+
+            // Update value display
+            valueSpan.textContent = axisValue.toFixed(2);
+        }
+    });
+
+    // Update buttons
+    const buttonDivs = elements.vizButtons.querySelectorAll('.viz-button');
+    gamepad.buttons.forEach((button, index) => {
+        const buttonDiv = buttonDivs[index];
+        if (buttonDiv) {
+            if (button.pressed) {
+                buttonDiv.classList.add('active');
+            } else {
+                buttonDiv.classList.remove('active');
+            }
+        }
+    });
 }
 
 function detectInput(gamepad, gamepadIndex) {

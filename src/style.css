@@ -163,6 +163,18 @@ header h1 {
     color: #444;
 }
 
+.about-content ul {
+    margin: 15px 0;
+    padding-left: 25px;
+}
+
+.about-content ul li {
+    font-size: 1.05em;
+    line-height: 1.7;
+    margin-bottom: 10px;
+    color: #444;
+}
+
 .about-content strong {
     color: #1e3c72;
 }

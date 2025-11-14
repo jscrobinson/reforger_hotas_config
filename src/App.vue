@@ -654,6 +654,40 @@ onUnmounted(() => {
           <li>Test your bindings in-game and come back to adjust if needed</li>
         </ul>
       </div>
+
+      <h3>Supported HOTAS & Flight Stick Hardware</h3>
+      <div class="about-content">
+        <p>This configurator works with virtually any joystick, throttle, or HOTAS system that connects via USB, including:</p>
+        <ul>
+          <li><strong>Thrustmaster:</strong> T.16000M, HOTAS Warthog, T.Flight HOTAS X, T.Flight HOTAS One, HOTAS Cougar</li>
+          <li><strong>Logitech:</strong> Extreme 3D Pro, G X56 HOTAS, G Saitek X52, X52 Pro, G Saitek X55</li>
+          <li><strong>VKB:</strong> Gladiator NXT, Gunfighter series, T-Rudders pedals</li>
+          <li><strong>Virpil:</strong> VPC Constellation ALPHA, WarBRD, MongoosT-50, VPC Throttle</li>
+          <li><strong>CH Products:</strong> Fighterstick, Pro Throttle, Pro Pedals</li>
+          <li><strong>Microsoft:</strong> Sidewinder series</li>
+          <li><strong>Generic USB joysticks and game controllers</strong> with analog axes and buttons</li>
+        </ul>
+        <p>If your controller shows up in Windows Game Controllers and has programmable buttons or axes, it will work with this tool. The configurator uses the browser's Gamepad API to detect inputs, so no drivers or additional software are required.</p>
+      </div>
+
+      <h3>Understanding Arma Reforger Flight Controls</h3>
+      <div class="about-content">
+        <p>Arma Reforger's helicopter flight model requires precise control over multiple axes simultaneously. Here's what each control system does:</p>
+        <p><strong>Cyclic (Roll & Pitch):</strong> Your main flight stick controls the helicopter's cyclic. Moving the stick forward/back pitches the nose down/up, while left/right movement rolls the aircraft. This is typically your primary joystick.</p>
+        <p><strong>Collective (Altitude):</strong> Usually bound to a throttle or slider, the collective controls your vertical lift. Increasing collective adds power to the rotors and makes you climb; decreasing it causes descent. Smooth collective control is essential for hovering.</p>
+        <p><strong>Anti-Torque Pedals (Yaw):</strong> These counter the torque from the main rotor and control your heading. Most pilots use rudder pedals, but you can also bind yaw to a twist axis on your stick or to buttons for digital input.</p>
+        <p><strong>Weapon Systems:</strong> If you're flying armed helicopters, you'll want dedicated buttons for weapons control, target cycling, and firing. Co-pilot/gunner positions have additional turret controls.</p>
+        <p>The key to successful HOTAS setup in Reforger is ensuring smooth analog input for your primary flight controls (cyclic and collective) while having easily accessible buttons for secondary functions like landing gear, lights, and weapons.</p>
+      </div>
+
+      <h3>Troubleshooting Common Issues</h3>
+      <div class="about-content">
+        <p><strong>Controller not detected:</strong> If your joystick isn't appearing, make sure it's properly connected and recognized by Windows. Open "Set up USB game controllers" in Windows settings to verify. Try unplugging and reconnecting the device, then refresh this page.</p>
+        <p><strong>HAT switch not working:</strong> Some HAT switches are detected as axes rather than buttons. Enable "HAT Mode" in the configurator for better detection. HAT switches typically output discrete values (often -1, 0, or +1) rather than smooth analog ranges.</p>
+        <p><strong>Axis inverted or wrong direction:</strong> Reforger allows you to invert axes in-game. If your control feels backward after configuration, check the game's control settings for invert options rather than reconfiguring here.</p>
+        <p><strong>Too sensitive or not sensitive enough:</strong> Axis sensitivity and dead zones can be adjusted within Arma Reforger's control settings. Start with your hardware configured here, then fine-tune sensitivity curves in-game for optimal feel.</p>
+        <p><strong>Multiple controllers interfering:</strong> If you have multiple game controllers connected (like an Xbox controller for ground combat and a HOTAS for flying), make sure you're binding the correct device. The joystick index number shown in the configurator helps identify which physical device is being configured.</p>
+      </div>
     </div>
 
     <!-- Ad: Top Banner -->
@@ -811,8 +845,8 @@ onUnmounted(() => {
 
     </div>
 
-    <!-- Ad: Bottom Banner -->
-    <div class="ad-container ad-bottom">
+    <!-- Ad: Bottom Banner - Only show when user has engaged with the tool -->
+    <div v-if="configuredCount > 0 || state.furthestActionIndex > 0" class="ad-container ad-bottom">
       <Adsense
         data-ad-client="ca-pub-8117946503724556"
         data-ad-slot="8517600527"

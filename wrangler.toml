@@ -1,7 +1,0 @@
-name = "reforger-hotas-prod"
-compatibility_date = "2025-11-13"
-pages_build_output_dir = "dist"
-
-# This configuration is for Cloudflare Pages
-# Custom domains are configured in the Cloudflare Dashboard, not here
-# GitHub integration handles automatic deployments

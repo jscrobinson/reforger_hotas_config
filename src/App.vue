@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
+import { ref, reactive, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import type { Action, AppState, GamepadState } from './types'
 
 // Action definitions with sensible FilterPreset defaults and hints
@@ -566,6 +566,28 @@ function triggerFileInput() {
 onMounted(() => {
   document.addEventListener('keydown', handleKeyDown)
   pollGamepads()
+
+  // Initialize AdSense ads after DOM is rendered and layout is calculated
+  // Use setTimeout to ensure CSS has been applied and width is calculated
+  setTimeout(() => {
+    try {
+      const adElements = document.querySelectorAll('.adsbygoogle')
+      console.log('Initializing', adElements.length, 'ad units')
+      adElements.forEach((ad, index) => {
+        const container = ad.parentElement
+        if (container) {
+          const width = container.offsetWidth
+          console.log(`Ad ${index} container width:`, width)
+          if (width === 0) {
+            console.warn(`Ad ${index} has zero width, this will cause errors`)
+          }
+        }
+        (window.adsbygoogle = window.adsbygoogle || []).push({})
+      })
+    } catch (err) {
+      console.error('AdSense initialization error:', err)
+    }
+  }, 100)
 })
 
 onUnmounted(() => {
@@ -659,7 +681,7 @@ onUnmounted(() => {
     <!-- Ad: Top Banner -->
     <div class="ad-container">
       <ins class="adsbygoogle"
-           style="display:block"
+           style="display:block;min-width:300px;width:100%"
            data-ad-client="ca-pub-8117946503724556"
            data-ad-slot="8517600527"
            data-ad-format="auto"
@@ -813,7 +835,7 @@ onUnmounted(() => {
     <!-- Ad: Bottom Banner -->
     <div class="ad-container ad-bottom">
       <ins class="adsbygoogle"
-           style="display:block"
+           style="display:block;min-width:300px;width:100%"
            data-ad-client="ca-pub-8117946503724556"
            data-ad-slot="8517600527"
            data-ad-format="auto"

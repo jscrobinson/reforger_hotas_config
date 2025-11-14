@@ -962,9 +962,14 @@ header h1 {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     text-align: center;
     min-height: 100px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: block;
+    overflow: hidden;
+}
+
+.ad-container ins.adsbygoogle {
+    display: block;
+    width: 100%;
+    min-width: 300px;
 }
 
 .ad-bottom {

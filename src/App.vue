@@ -656,7 +656,15 @@ onUnmounted(() => {
       </div>
     </div>
 
-
+    <!-- Ad: Top Banner -->
+    <div class="ad-container">
+      <Adsense
+        data-ad-client="ca-pub-8117946503724556"
+        data-ad-slot="8517600527"
+        data-ad-format="auto"
+        data-full-width-responsive="true">
+      </Adsense>
+    </div>
 
     <div class="status-section">
       <div class="joystick-status">
@@ -803,7 +811,15 @@ onUnmounted(() => {
 
     </div>
 
-
+    <!-- Ad: Bottom Banner -->
+    <div class="ad-container ad-bottom">
+      <Adsense
+        data-ad-client="ca-pub-8117946503724556"
+        data-ad-slot="8517600527"
+        data-ad-format="auto"
+        data-full-width-responsive="true">
+      </Adsense>
+    </div>
 
     <!-- Footer -->
     <footer class="page-footer">

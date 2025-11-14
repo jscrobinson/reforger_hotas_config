@@ -7,6 +7,6 @@ import Ads from 'vue-google-adsense'
 const app = createApp(App)
 
 app.use(ScriptX)
-app.use(Ads.AutoAdsense, { adClient: 'ca-pub-8117946503724556', isNewAdsCode: true })
+app.use(Ads.Adsense, {})
 
 app.mount('#app')

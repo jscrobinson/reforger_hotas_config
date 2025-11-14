@@ -9,6 +9,16 @@ Thumbs.db
 *.swo
 *~
 
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Wrangler
+.wrangler/
+wrangler.jsonc.backup
+
 # Test files
 *.test.conf
 test_*.conf

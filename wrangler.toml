@@ -1,0 +1,10 @@
+name = "reforger-hotas-prod"
+compatibility_date = "2025-11-13"
+pages_build_output_dir = "dist"
+
+# This configuration is for Cloudflare Pages
+# The build happens via `npm run build` (which runs Vite)
+# Then wrangler deploys the pre-built `dist` folder
+
+# Note: For Pages deployments, you can also configure this via the Cloudflare dashboard
+# or use CLI flags with `wrangler pages deploy`

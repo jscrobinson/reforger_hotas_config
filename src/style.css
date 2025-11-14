@@ -10,8 +10,13 @@ html {
 
 body {
     font-family: 'Courier New', 'Consolas', monospace;
-    background: linear-gradient(135deg, #2d3436 0%, #3d4748 50%, #2d3436 100%);
+    background:
+        linear-gradient(135deg, rgba(45, 52, 54, 0.85) 0%, rgba(61, 71, 72, 0.85) 50%, rgba(45, 52, 54, 0.85) 100%),
+        url('/bg-texture.png');
     background-attachment: fixed;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
     color: #dfe6e9;
     min-height: 100vh;
     padding: 20px;
@@ -26,8 +31,8 @@ body::before {
     right: 0;
     bottom: 0;
     background-image:
-        repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,.03) 2px, rgba(0,0,0,.03) 4px),
-        repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(0,0,0,.03) 2px, rgba(0,0,0,.03) 4px);
+        repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,.1) 2px, rgba(0,0,0,.1) 4px),
+        repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(0,0,0,.1) 2px, rgba(0,0,0,.1) 4px);
     pointer-events: none;
     z-index: 0;
 }
@@ -43,8 +48,8 @@ header {
     text-align: center;
     color: #d4af37;
     margin-bottom: 30px;
-    background: rgba(67, 76, 94, 0.9);
-    padding: 30px 20px;
+    background: rgba(67, 76, 94, 0.95);
+    padding: 30px 20px 30px 20px;
     border: 3px solid #4a5d23;
     border-left: 8px solid #d4af37;
     box-shadow:
@@ -52,6 +57,26 @@ header {
         5px 5px 15px rgba(0, 0, 0, 0.5),
         inset 0 1px 0 rgba(255,255,255,0.1);
     position: relative;
+}
+
+.header-badge {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    width: 120px;
+    height: 120px;
+    opacity: 0.95;
+    z-index: 2;
+    filter: drop-shadow(3px 3px 5px rgba(0,0,0,0.5));
+}
+
+@media (max-width: 768px) {
+    .header-badge {
+        width: 80px;
+        height: 80px;
+        top: 10px;
+        left: 10px;
+    }
 }
 
 header::before {
@@ -64,6 +89,7 @@ header::before {
     font-weight: bold;
     letter-spacing: 2px;
     opacity: 0.8;
+    z-index: 2;
 }
 
 header::after {

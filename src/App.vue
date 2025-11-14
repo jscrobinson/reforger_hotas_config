@@ -4,13 +4,6 @@ import type { Action, AppState, GamepadState } from './types'
 
 // Action definitions with sensible FilterPreset defaults and hints
 const ACTIONS: Omit<Action, 'binding'>[] = [
-  { name: 'PerformAction', filterPreset: 'pressed', hint: 'Interact with objects/doors', hardware: 'button', importance: 'important' },
-  { name: 'SelectAction', filterPreset: 'next', hint: 'Open action menu', hardware: 'button', importance: 'important' },
-  { name: 'CharacterNextWeapon', filterPreset: 'click', hint: 'Switch to next weapon', hardware: 'hat', importance: 'important' },
-  { name: 'CharacterFire', filterPreset: 'hold', hint: 'Fire primary weapon', hardware: 'trigger', importance: 'critical' },
-  { name: 'CharacterNextFireMode', filterPreset: 'click', hint: 'Change fire mode (single/burst/auto)', hardware: 'button', importance: 'important' },
-  { name: 'CharacterNextMuzzle', filterPreset: 'click', hint: 'Select next muzzle/barrel', hardware: 'button', importance: 'optional' },
-  { name: 'GadgetMap', filterPreset: 'select', hint: 'Open tactical map', hardware: 'button', importance: 'important' },
   { name: 'HelicopterCollectiveIncrease', filterPreset: 'up', hint: 'Increase altitude (raise collective)', hardware: 'throttle', importance: 'critical' },
   { name: 'HelicopterCollectiveDecrease', filterPreset: 'down', hint: 'Decrease altitude (lower collective)', hardware: 'throttle', importance: 'critical' },
   { name: 'HelicopterAntiTorqueLeft', filterPreset: 'left', hint: 'Yaw left (left pedal)', hardware: 'pedals', importance: 'critical' },
@@ -38,8 +31,6 @@ const ACTIONS: Omit<Action, 'binding'>[] = [
   { name: 'TurretAimDown', filterPreset: 'down', hint: 'Depress turret down', hardware: 'stick', importance: 'important' },
   { name: 'TurretAimLeft', filterPreset: 'left', hint: 'Fine aim left', hardware: 'stick', importance: 'optional' },
   { name: 'TurretAimRight', filterPreset: 'right', hint: 'Fine aim right', hardware: 'stick', importance: 'optional' },
-  { name: 'VONDirectToggle', filterPreset: 'click', hint: 'Toggle proximity voice chat', hardware: 'button', importance: 'important' },
-  { name: 'VONChannel', filterPreset: 'hold', hint: 'Push-to-talk radio', hardware: 'button', importance: 'important' },
   { name: 'GetOut', filterPreset: 'click', hint: 'Exit vehicle safely', hardware: 'button', importance: 'important' },
   { name: 'JumpOut', filterPreset: 'click', hint: 'Emergency eject (dangerous!)', hardware: 'button', importance: 'optional' },
   { name: 'HelicopterEngineStart', filterPreset: 'hold', hint: 'Start engine and rotors', hardware: 'button', importance: 'critical' },

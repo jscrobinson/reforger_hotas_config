@@ -8,3 +8,6 @@ pages_build_output_dir = "dist"
 
 # Note: For Pages deployments, you can also configure this via the Cloudflare dashboard
 # or use CLI flags with `wrangler pages deploy`
+[[routes]]
+pattern = "hotas.deltafarce.win"
+custom_domain = true

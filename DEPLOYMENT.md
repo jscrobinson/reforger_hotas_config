@@ -1,8 +1,25 @@
 # Deployment Guide
 
-This project is set up to deploy to **Cloudflare Pages** using Wrangler.
+This project is set up to deploy to **Cloudflare Pages**.
 
-## Prerequisites
+## Recommended: GitHub Integration (Automatic Deployments)
+
+**⭐ The recommended approach is to use GitHub integration for automatic deployments.**
+
+See [GITHUB_INTEGRATION.md](./GITHUB_INTEGRATION.md) for complete setup instructions.
+
+### Quick Setup:
+1. Connect your GitHub repo to Cloudflare Pages via the dashboard
+2. Push to `main` branch → Automatic deployment
+3. No local wrangler commands needed!
+
+---
+
+## Alternative: Manual Local Deployment
+
+If you need to deploy manually from your local machine:
+
+### Prerequisites
 
 1. **Cloudflare Account**: Sign up at [cloudflare.com](https://cloudflare.com)
 2. **Wrangler CLI**: Already installed via npm dependencies

@@ -67,6 +67,9 @@ const vizDeviceName = ref('No device detected')
 const vizAxesValues = ref<number[]>([])
 const vizButtonsPressed = ref<boolean[]>([])
 
+// Git commit hash injected at build time
+const gitHash = __GIT_HASH__
+
 // Computed
 const filteredActions = computed(() => {
   return state.actions.filter(action => {
@@ -807,7 +810,7 @@ onUnmounted(() => {
           Arma Reforger HOTAS Configurator
         </a>
         <span class="version-separator">•</span>
-        <span class="version-info">Version: <code>9a2010e</code></span>
+        <span class="version-info">Version: <code>{{ gitHash }}</code></span>
       </p>
     </footer>
   </div>

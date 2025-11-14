@@ -5,3 +5,6 @@ declare module '*.vue' {
   const component: DefineComponent<{}, {}, any>
   export default component
 }
+
+// Global build-time constants injected by Vite
+declare const __GIT_HASH__: string

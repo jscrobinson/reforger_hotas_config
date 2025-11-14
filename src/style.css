@@ -411,6 +411,84 @@ header h1 {
     background: #F57C00;
 }
 
+.btn-pulse {
+    animation: pulse-button 2s ease-in-out infinite;
+    font-size: 1.1em;
+    padding: 14px 28px;
+}
+
+@keyframes pulse-button {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 4px 8px rgba(76, 175, 80, 0.3);
+    }
+    50% {
+        transform: scale(1.05);
+        box-shadow: 0 6px 16px rgba(76, 175, 80, 0.6);
+    }
+}
+
+/* Completion Banner */
+.completion-banner {
+    background: linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%);
+    border-radius: 12px;
+    padding: 30px;
+    margin: 20px 0;
+    box-shadow: 0 8px 24px rgba(76, 175, 80, 0.4);
+    animation: slideIn 0.5s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.completion-content {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    color: white;
+}
+
+.completion-icon {
+    font-size: 3em;
+    animation: bounce 1s ease infinite;
+}
+
+.completion-message h3 {
+    font-size: 1.8em;
+    margin: 0 0 10px 0;
+    color: white;
+}
+
+.completion-message p {
+    font-size: 1.1em;
+    margin: 0;
+    color: rgba(255, 255, 255, 0.95);
+    line-height: 1.5;
+}
+
+@media (max-width: 768px) {
+    .completion-content {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .completion-message h3 {
+        font-size: 1.5em;
+    }
+
+    .completion-message p {
+        font-size: 1em;
+    }
+}
+
 .main-content {
     display: grid;
     grid-template-columns: 1fr 1fr;

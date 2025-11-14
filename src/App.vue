@@ -109,6 +109,10 @@ const resumeActionNumber = computed(() => {
   return resumeIndex + 1
 })
 
+const isConfigurationComplete = computed(() => {
+  return configuredCount.value === state.actions.length && configuredCount.value > 0
+})
+
 // Methods
 function formatActionName(name: string): string {
   return name.replace(/([A-Z])/g, ' $1').trim()
@@ -682,10 +686,23 @@ onUnmounted(() => {
         <button @click="triggerFileInput" class="btn btn-secondary">Load Existing Config</button>
         <input type="file" id="config-file-input" accept=".conf" style="display: none;" @change="handleLoadConfig">
         <button @click="startConfiguration" :disabled="state.configuring" class="btn btn-primary">Start Configuring</button>
-        <button @click="downloadConfig" :disabled="configuredCount === 0" class="btn btn-success">Download Config</button>
+        <button @click="downloadConfig" :disabled="configuredCount === 0" class="btn btn-success" :class="{ 'btn-pulse': isConfigurationComplete }">
+          {{ isConfigurationComplete ? '✓ Download Your Config File' : 'Download Config' }}
+        </button>
       </div>
       <div class="save-location-hint">
         <p><strong>Save Location:</strong> %USERPROFILE%\Documents\My Games\ArmaReforger\profile\.save\settings\customInputConfigs</p>
+      </div>
+    </div>
+
+    <!-- Configuration Complete Banner -->
+    <div v-if="isConfigurationComplete" class="completion-banner">
+      <div class="completion-content">
+        <div class="completion-icon">🎉</div>
+        <div class="completion-message">
+          <h3>Configuration Complete!</h3>
+          <p>All {{ state.actions.length }} actions have been configured. Click "Download Your Config File" above to save your configuration.</p>
+        </div>
       </div>
     </div>
 

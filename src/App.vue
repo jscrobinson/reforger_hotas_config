@@ -581,6 +581,10 @@ onUnmounted(() => {
     <header>
       <h1>Delta Farce - Arma Reforger HOTAS Configurator</h1>
       <p class="subtitle">Configure your joystick inputs for Arma Reforger</p>
+      <div class="header-cta">
+        <a href="#configurator" class="btn-cta">Start Configuring Now →</a>
+        <p class="cta-subtext">Free tool • Works with any joystick • No installation required</p>
+      </div>
     </header>
 
     <!-- Community Section -->
@@ -699,6 +703,9 @@ onUnmounted(() => {
         data-full-width-responsive="true">
       </Adsense>
     </div>
+
+    <!-- Configurator Tool Section -->
+    <div id="configurator"></div>
 
     <div class="status-section">
       <div class="joystick-status">

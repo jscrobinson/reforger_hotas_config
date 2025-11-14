@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted, onUnmounted, nextTick } from 'vue'
+import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
 import type { Action, AppState, GamepadState } from './types'
 
 // Action definitions with sensible FilterPreset defaults and hints
@@ -566,44 +566,6 @@ function triggerFileInput() {
 onMounted(() => {
   document.addEventListener('keydown', handleKeyDown)
   pollGamepads()
-
-  // Initialize AdSense ads after DOM is rendered and layout is calculated
-  // Use setTimeout to ensure CSS has been applied and width is calculated
-  setTimeout(() => {
-    try {
-      const adElements = document.querySelectorAll('.adsbygoogle')
-      console.log('Found', adElements.length, 'ad units')
-
-      let initializedCount = 0
-      adElements.forEach((ad, index) => {
-        // Check if this ad has already been initialized
-        const adElement = ad as HTMLElement
-        const status = adElement.getAttribute('data-adsbygoogle-status')
-
-        if (status === 'done') {
-          console.log(`Ad ${index} already initialized, skipping`)
-          return
-        }
-
-        const container = ad.parentElement
-        if (container) {
-          const width = container.offsetWidth
-          console.log(`Ad ${index} container width:`, width)
-          if (width === 0) {
-            console.warn(`Ad ${index} has zero width, this will cause errors`)
-            return
-          }
-        }
-
-        (window.adsbygoogle = window.adsbygoogle || []).push({})
-        initializedCount++
-      })
-
-      console.log(`Initialized ${initializedCount} new ad units`)
-    } catch (err) {
-      console.error('AdSense initialization error:', err)
-    }
-  }, 100)
 })
 
 onUnmounted(() => {
@@ -838,6 +800,7 @@ onUnmounted(() => {
           </div>
         </div>
       </div>
+
     </div>
 
 

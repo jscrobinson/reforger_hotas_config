@@ -8,8 +8,3 @@ declare module '*.vue' {
 
 // Global build-time constants injected by Vite
 declare const __GIT_HASH__: string
-
-// Google AdSense
-interface Window {
-  adsbygoogle: any[]
-}

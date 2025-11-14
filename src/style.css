@@ -967,8 +967,7 @@ header h1 {
 }
 
 .ad-container ins.adsbygoogle {
-    /* display: block; */
-    display: none;
+    display: block;
     width: 100%;
     min-width: 300px;
 }

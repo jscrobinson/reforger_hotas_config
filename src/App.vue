@@ -623,15 +623,6 @@ onUnmounted(() => {
 
     <!-- Community Section -->
     <div class="community-section">
-      <!-- Ad: Top Banner -->
-      <div class="ad-container">
-        <ins class="adsbygoogle"
-            style="display:block;min-width:300px;width:100%"
-            data-ad-client="ca-pub-8117946503724556"
-            data-ad-slot="8517600527"
-            data-ad-format="auto"
-            data-full-width-responsive="true"></ins>
-      </div>
       <div class="community-box">
         <h3>Join Our Community</h3>
         <div class="community-links">
@@ -703,7 +694,7 @@ onUnmounted(() => {
       </div>
     </div>
 
-    
+
 
     <div class="status-section">
       <div class="joystick-status">
@@ -849,15 +840,7 @@ onUnmounted(() => {
       </div>
     </div>
 
-    <!-- Ad: Bottom Banner -->
-    <div class="ad-container ad-bottom">
-      <ins class="adsbygoogle"
-           style="display:block;min-width:300px;width:100%"
-           data-ad-client="ca-pub-8117946503724556"
-           data-ad-slot="8517600527"
-           data-ad-format="auto"
-           data-full-width-responsive="true"></ins>
-    </div>
+
 
     <!-- Footer -->
     <footer class="page-footer">

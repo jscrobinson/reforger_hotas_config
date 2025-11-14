@@ -6,7 +6,8 @@
     "exclude": [
       ".git",
       ".claude",
-      "*.md"
+      "*.md",
+      "docker-compose.ysml"
     ]
   }
 }

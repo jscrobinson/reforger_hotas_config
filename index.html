@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arma Reforger HOTAS Configurator</title>
+    <title>Delta Farce - Arma Reforger HOTAS Configurator</title>
     <link rel="stylesheet" href="style.css">
 
     <!-- Google AdSense -->
@@ -13,7 +13,7 @@
 <body>
     <div class="container">
         <header>
-            <h1>Arma Reforger HOTAS Configurator</h1>
+            <h1>Delta Farce - Arma Reforger HOTAS Configurator</h1>
             <p class="subtitle">Configure your joystick inputs for Arma Reforger</p>
         </header>
 
@@ -153,6 +153,12 @@
                         </label>
                     </div>
 
+                    <div class="action-controls">
+                        <button id="skip-action-btn" class="btn btn-secondary">Skip</button>
+                        <button id="clear-action-btn" class="btn btn-warning">Clear Binding</button>
+                        <button id="resume-btn" class="btn btn-primary" style="display: none;">Resume from Action <span id="resume-action-number"></span></button>
+                    </div>
+
                     <!-- Joystick Visualization -->
                     <div class="joystick-visualization" id="joystick-visualization">
                         <div class="viz-header">
@@ -168,12 +174,7 @@
                             </div>
                         </div>
                     </div>
-
-                    <div class="action-controls">
-                        <button id="skip-action-btn" class="btn btn-secondary">Skip</button>
-                        <button id="clear-action-btn" class="btn btn-warning">Clear Binding</button>
-                        <button id="resume-btn" class="btn btn-primary" style="display: none;">Resume from Action <span id="resume-action-number"></span></button>
-                    </div>
+                    
                 </div>
                 <div class="progress">
                     <div class="progress-text" id="progress-text">0 / 0</div>

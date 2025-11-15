@@ -37,6 +37,19 @@ const ACTIONS: Omit<Action, 'binding'>[] = [
   { name: 'HelicopterEngineStop', filterPreset: 'click', hint: 'Stop engine and rotors', hardware: 'button', importance: 'critical' }
 ]
 
+// Axis calibration data
+interface AxisCalibrationData {
+  min: number
+  max: number
+  center: number
+}
+
+interface AxisCalibration {
+  [gamepadIndex: number]: {
+    [axisIndex: number]: AxisCalibrationData
+  }
+}
+
 // State
 const state = reactive<AppState>({
   actions: ACTIONS.map(action => ({ ...action, binding: null })),
@@ -50,6 +63,8 @@ const state = reactive<AppState>({
   inputCooldown: false,
   pendingInput: null
 })
+
+const axisCalibration = reactive<AxisCalibration>({})
 
 const hatModeEnabled = ref(false)
 const vizAxesCount = ref(0)
@@ -137,6 +152,51 @@ function resetGamepadBaseline() {
       state.previousGamepadState[i] = { ...stateSnapshot }
       state.baselineGamepadState[i] = { ...stateSnapshot }
     }
+  }
+}
+
+// Axis calibration functions
+function updateAxisCalibration(gamepadIndex: number, axisIndex: number, value: number) {
+  if (!axisCalibration[gamepadIndex]) {
+    axisCalibration[gamepadIndex] = {}
+  }
+
+  if (!axisCalibration[gamepadIndex][axisIndex]) {
+    axisCalibration[gamepadIndex][axisIndex] = {
+      min: value,
+      max: value,
+      center: value
+    }
+  } else {
+    const calibData = axisCalibration[gamepadIndex][axisIndex]
+    calibData.min = Math.min(calibData.min, value)
+    calibData.max = Math.max(calibData.max, value)
+    calibData.center = (calibData.min + calibData.max) / 2
+  }
+}
+
+function normalizeAxisValue(gamepadIndex: number, axisIndex: number, value: number): number {
+  const calibData = axisCalibration[gamepadIndex]?.[axisIndex]
+
+  if (!calibData) {
+    return value
+  }
+
+  const { min, max, center } = calibData
+  const range = max - min
+
+  if (range < 0.1) {
+    return 0
+  }
+
+  if (value < center) {
+    const leftRange = center - min
+    if (leftRange < 0.01) return 0
+    return -1 * (center - value) / leftRange
+  } else {
+    const rightRange = max - center
+    if (rightRange < 0.01) return 0
+    return (value - center) / rightRange
   }
 }
 
@@ -282,9 +342,14 @@ function detectInput(gamepad: Gamepad, gamepadIndex: number) {
   const baselineState = state.baselineGamepadState[gamepadIndex]
 
   for (let i = 0; i < gamepad.axes.length; i++) {
-    const axisValue = gamepad.axes[i]
-    const prevAxisValue = prevState.axes[i] !== undefined ? prevState.axes[i] : axisValue
-    const baselineAxisValue = baselineState?.axes[i] !== undefined ? baselineState.axes[i] : axisValue
+    const rawAxisValue = gamepad.axes[i]
+    const axisValue = normalizeAxisValue(gamepadIndex, i, rawAxisValue)
+
+    const prevRawAxisValue = prevState.axes[i] !== undefined ? prevState.axes[i] : rawAxisValue
+    const prevAxisValue = normalizeAxisValue(gamepadIndex, i, prevRawAxisValue)
+
+    const baselineRawAxisValue = baselineState?.axes[i] !== undefined ? baselineState.axes[i] : rawAxisValue
+    const baselineAxisValue = normalizeAxisValue(gamepadIndex, i, baselineRawAxisValue)
 
     const frameDelta = Math.abs(axisValue - prevAxisValue)
     const totalMovement = Math.abs(axisValue - baselineAxisValue)
@@ -339,7 +404,10 @@ function updateVisualization(gamepad: Gamepad | null) {
   if (!gamepad) return
 
   vizDeviceName.value = gamepad.id
-  vizAxesValues.value = [...gamepad.axes]
+  // Store normalized axis values for visualization
+  vizAxesValues.value = gamepad.axes.map((rawValue, index) =>
+    normalizeAxisValue(gamepad.index, index, rawValue)
+  )
   vizButtonsPressed.value = gamepad.buttons.map(b => b.pressed)
 }
 
@@ -363,6 +431,11 @@ function pollGamepads() {
         }
         vizAxesCount.value = gamepad.axes.length
         vizButtonsCount.value = gamepad.buttons.length
+      }
+
+      // Update calibration data for all axes (always, even when not configuring)
+      for (let axisIndex = 0; axisIndex < gamepad.axes.length; axisIndex++) {
+        updateAxisCalibration(i, axisIndex, gamepad.axes[axisIndex])
       }
 
       if (state.configuring && state.currentActionIndex >= 0) {
@@ -679,6 +752,7 @@ onUnmounted(() => {
       <h3>Troubleshooting Common Issues</h3>
       <div class="about-content">
         <p><strong>Controller not detected:</strong> If your joystick isn't appearing, make sure it's properly connected and recognized by Windows. Open "Set up USB game controllers" in Windows settings to verify. Try unplugging and reconnecting the device, then refresh this page.</p>
+        <p><strong>Axes only registering positive values (Sidewinder X2, rudder issues):</strong> This configurator now includes automatic axis calibration! Before configuring, move all your axes, throttles, and rudders through their full range of motion. The tool will automatically detect and adjust for axes that don't center at zero. This fixes common issues with joysticks like the Sidewinder X2 where the rudder only registers 0 to +11 instead of negative to positive values.</p>
         <p><strong>HAT switch not working:</strong> Some HAT switches are detected as axes rather than buttons. Enable "HAT Mode" in the configurator for better detection. HAT switches typically output discrete values (often -1, 0, or +1) rather than smooth analog ranges.</p>
         <p><strong>Axis inverted or wrong direction:</strong> Reforger allows you to invert axes in-game. If your control feels backward after configuration, check the game's control settings for invert options rather than reconfiguring here.</p>
         <p><strong>Too sensitive or not sensitive enough:</strong> Axis sensitivity and dead zones can be adjusted within Arma Reforger's control settings. Start with your hardware configured here, then fine-tune sensitivity curves in-game for optimal feel.</p>
@@ -715,6 +789,17 @@ onUnmounted(() => {
     </div>
 
     <div class="config-section">
+      <div class="calibration-notice">
+        <h3>📍 Important: Calibrate Your Axes First</h3>
+        <p><strong>Before clicking "Start Configuring":</strong></p>
+        <ol>
+          <li>Move <strong>all</strong> your joystick axes through their full range of motion</li>
+          <li>Move throttles from minimum to maximum</li>
+          <li>Press pedals or twist rudder through full left and right</li>
+          <li>Move all HAT switches in all directions</li>
+        </ol>
+        <p class="calibration-why">This helps the tool understand your joystick's natural center points and ranges, fixing issues where axes don't properly center at zero (like the Sidewinder X2 rudder problem).</p>
+      </div>
       <div class="config-controls">
         <button @click="triggerFileInput" class="btn btn-secondary">Load Existing Config</button>
         <input type="file" id="config-file-input" accept=".conf" style="display: none;" @change="handleLoadConfig">

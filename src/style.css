@@ -602,6 +602,54 @@ header h1 {
     border-left: 6px solid #d4af37;
 }
 
+.calibration-notice {
+    background: rgba(212, 175, 55, 0.15);
+    border: 2px solid #d4af37;
+    border-left: 6px solid #d4af37;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 0;
+}
+
+.calibration-notice h3 {
+    color: #d4af37;
+    margin-bottom: 12px;
+    font-size: 1.3em;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.calibration-notice p {
+    color: #bdc3c7;
+    margin-bottom: 10px;
+    line-height: 1.6;
+}
+
+.calibration-notice strong {
+    color: #d4af37;
+    font-weight: 900;
+}
+
+.calibration-notice ol {
+    margin: 10px 0 10px 20px;
+    color: #ecf0f1;
+}
+
+.calibration-notice li {
+    margin-bottom: 8px;
+    line-height: 1.5;
+}
+
+.calibration-why {
+    margin-top: 15px;
+    padding: 10px;
+    background: rgba(74, 93, 35, 0.25);
+    border-left: 3px solid #4a5d23;
+    font-size: 0.95em;
+    font-style: italic;
+}
+
 .config-controls {
     display: flex;
     gap: 15px;

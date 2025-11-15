@@ -54,6 +54,8 @@ let state = {
     connectedGamepads: {},
     previousGamepadState: {},  // Frame-to-frame state for detecting changes
     baselineGamepadState: {},  // Baseline when action started (for throttles)
+    axisCalibration: {},  // Calibration data: { gamepadIndex: { axisIndex: { min, max, center } } }
+    calibrationMode: false,  // Whether currently in calibration mode
     filter: 'all',
     inputCooldown: false,  // Prevent rapid-fire input detection
     pendingInput: null  // Input detected but waiting for confirmation
@@ -162,6 +164,11 @@ function pollGamepads() {
                 initializeVisualization(gamepad);
             }
 
+            // Update calibration data for all axes (always, even when not configuring)
+            for (let axisIndex = 0; axisIndex < gamepad.axes.length; axisIndex++) {
+                updateAxisCalibration(i, axisIndex, gamepad.axes[axisIndex]);
+            }
+
             // Store current state for change detection
             if (state.configuring && state.currentActionIndex >= 0) {
                 detectInput(gamepad, i);
@@ -223,11 +230,14 @@ function updateVisualization(gamepad) {
     const axisBars = elements.vizAxes.querySelectorAll('.viz-axis-bar');
     const axisValues = elements.vizAxes.querySelectorAll('.viz-axis-value');
 
-    gamepad.axes.forEach((axisValue, index) => {
+    gamepad.axes.forEach((rawAxisValue, index) => {
         const bar = axisBars[index];
         const valueSpan = axisValues[index];
 
         if (bar && valueSpan) {
+            // Use normalized axis value for visualization
+            const axisValue = normalizeAxisValue(gamepad.index, index, rawAxisValue);
+
             // Calculate bar position (axis values range from -1 to 1)
             // Map to 0-100% where 50% is center
             const percentage = ((axisValue + 1) / 2) * 100;
@@ -250,8 +260,14 @@ function updateVisualization(gamepad) {
                 bar.classList.remove('active');
             }
 
-            // Update value display
-            valueSpan.textContent = axisValue.toFixed(2);
+            // Update value display (show both normalized and raw)
+            const calibData = state.axisCalibration[gamepad.index]?.[index];
+            if (calibData) {
+                valueSpan.textContent = `${axisValue.toFixed(2)} (${rawAxisValue.toFixed(2)})`;
+                valueSpan.title = `Normalized: ${axisValue.toFixed(2)}, Raw: ${rawAxisValue.toFixed(2)}\nMin: ${calibData.min.toFixed(2)}, Center: ${calibData.center.toFixed(2)}, Max: ${calibData.max.toFixed(2)}`;
+            } else {
+                valueSpan.textContent = axisValue.toFixed(2);
+            }
         }
     });
 
@@ -307,9 +323,14 @@ function detectInput(gamepad, gamepadIndex) {
     const baselineState = state.baselineGamepadState[gamepadIndex];
 
     for (let i = 0; i < gamepad.axes.length; i++) {
-        const axisValue = gamepad.axes[i];
-        const prevAxisValue = prevState.axes[i] !== undefined ? prevState.axes[i] : axisValue;
-        const baselineAxisValue = baselineState?.axes[i] !== undefined ? baselineState.axes[i] : axisValue;
+        const rawAxisValue = gamepad.axes[i];
+        const axisValue = normalizeAxisValue(gamepadIndex, i, rawAxisValue);
+
+        const prevRawAxisValue = prevState.axes[i] !== undefined ? prevState.axes[i] : rawAxisValue;
+        const prevAxisValue = normalizeAxisValue(gamepadIndex, i, prevRawAxisValue);
+
+        const baselineRawAxisValue = baselineState?.axes[i] !== undefined ? baselineState.axes[i] : rawAxisValue;
+        const baselineAxisValue = normalizeAxisValue(gamepadIndex, i, baselineRawAxisValue);
 
         // Calculate frame-to-frame delta and total movement from baseline
         const frameDelta = Math.abs(axisValue - prevAxisValue);
@@ -446,6 +467,68 @@ function resetGamepadBaseline() {
             state.baselineGamepadState[i] = { ...state_snapshot };
         }
     }
+}
+
+// Calibration system for axis normalization
+function updateAxisCalibration(gamepadIndex, axisIndex, value) {
+    if (!state.axisCalibration[gamepadIndex]) {
+        state.axisCalibration[gamepadIndex] = {};
+    }
+
+    if (!state.axisCalibration[gamepadIndex][axisIndex]) {
+        // Initialize with first value
+        state.axisCalibration[gamepadIndex][axisIndex] = {
+            min: value,
+            max: value,
+            center: value
+        };
+    } else {
+        // Update min/max
+        const calibData = state.axisCalibration[gamepadIndex][axisIndex];
+        calibData.min = Math.min(calibData.min, value);
+        calibData.max = Math.max(calibData.max, value);
+        // Center is midpoint between min and max
+        calibData.center = (calibData.min + calibData.max) / 2;
+    }
+}
+
+function normalizeAxisValue(gamepadIndex, axisIndex, value) {
+    const calibData = state.axisCalibration[gamepadIndex]?.[axisIndex];
+
+    if (!calibData) {
+        // No calibration data yet, return raw value
+        return value;
+    }
+
+    const { min, max, center } = calibData;
+    const range = max - min;
+
+    // If range is too small, axis probably doesn't move (digital hat or broken)
+    if (range < 0.1) {
+        return 0;
+    }
+
+    // Normalize to -1 to +1 range with center at 0
+    if (value < center) {
+        // Map [min, center] to [-1, 0]
+        const leftRange = center - min;
+        if (leftRange < 0.01) return 0;
+        return -1 * (center - value) / leftRange;
+    } else {
+        // Map [center, max] to [0, 1]
+        const rightRange = max - center;
+        if (rightRange < 0.01) return 0;
+        return (value - center) / rightRange;
+    }
+}
+
+function isAxisCalibrated(gamepadIndex, axisIndex) {
+    const calibData = state.axisCalibration[gamepadIndex]?.[axisIndex];
+    if (!calibData) return false;
+
+    // Consider calibrated if we've seen enough range (at least 0.5 total movement)
+    const range = calibData.max - calibData.min;
+    return range >= 0.5;
 }
 
 // Configuration flow

@@ -67,11 +67,17 @@ const state = reactive<AppState>({
 const axisCalibration = reactive<AxisCalibration>({})
 
 const hatModeEnabled = ref(false)
-const vizAxesCount = ref(0)
-const vizButtonsCount = ref(0)
-const vizDeviceName = ref('No device detected')
-const vizAxesValues = ref<number[]>([])
-const vizButtonsPressed = ref<boolean[]>([])
+const calibrationModeEnabled = ref(false)
+
+// Visualization data for all connected gamepads
+interface GamepadVisualization {
+  index: number
+  name: string
+  axes: number[]
+  buttons: boolean[]
+}
+
+const gamepadVisualizations = ref<GamepadVisualization[]>([])
 
 // Git commit hash injected at build time
 const gitHash = __GIT_HASH__
@@ -157,6 +163,9 @@ function resetGamepadBaseline() {
 
 // Axis calibration functions
 function updateAxisCalibration(gamepadIndex: number, axisIndex: number, value: number) {
+  // Only track calibration if calibration mode is enabled
+  if (!calibrationModeEnabled.value) return
+
   if (!axisCalibration[gamepadIndex]) {
     axisCalibration[gamepadIndex] = {}
   }
@@ -176,6 +185,11 @@ function updateAxisCalibration(gamepadIndex: number, axisIndex: number, value: n
 }
 
 function normalizeAxisValue(gamepadIndex: number, axisIndex: number, value: number): number {
+  // Only apply normalization if calibration mode is enabled
+  if (!calibrationModeEnabled.value) {
+    return value
+  }
+
   const calibData = axisCalibration[gamepadIndex]?.[axisIndex]
 
   if (!calibData) {
@@ -400,15 +414,24 @@ function detectInput(gamepad: Gamepad, gamepadIndex: number) {
   }
 }
 
-function updateVisualization(gamepad: Gamepad | null) {
-  if (!gamepad) return
+function updateVisualizations(gamepads: (Gamepad | null)[]) {
+  const visualizations: GamepadVisualization[] = []
 
-  vizDeviceName.value = gamepad.id
-  // Store normalized axis values for visualization
-  vizAxesValues.value = gamepad.axes.map((rawValue, index) =>
-    normalizeAxisValue(gamepad.index, index, rawValue)
-  )
-  vizButtonsPressed.value = gamepad.buttons.map(b => b.pressed)
+  for (let i = 0; i < gamepads.length; i++) {
+    const gamepad = gamepads[i]
+    if (gamepad) {
+      visualizations.push({
+        index: gamepad.index,
+        name: gamepad.id,
+        axes: gamepad.axes.map((rawValue, axisIndex) =>
+          normalizeAxisValue(gamepad.index, axisIndex, rawValue)
+        ),
+        buttons: gamepad.buttons.map(b => b.pressed)
+      })
+    }
+  }
+
+  gamepadVisualizations.value = visualizations
 }
 
 let animationFrameId: number | null = null
@@ -416,21 +439,17 @@ let animationFrameId: number | null = null
 function pollGamepads() {
   const gamepads = navigator.getGamepads()
   let hasGamepads = false
-  let firstGamepad: Gamepad | null = null
 
   for (let i = 0; i < gamepads.length; i++) {
     const gamepad = gamepads[i]
     if (gamepad) {
       hasGamepads = true
-      if (!firstGamepad) firstGamepad = gamepad
 
       if (!state.connectedGamepads[i]) {
         state.connectedGamepads[i] = {
           id: gamepad.id,
           index: i
         }
-        vizAxesCount.value = gamepad.axes.length
-        vizButtonsCount.value = gamepad.buttons.length
       }
 
       // Update calibration data for all axes (always, even when not configuring)
@@ -448,9 +467,8 @@ function pollGamepads() {
     state.connectedGamepads = {}
   }
 
-  if (firstGamepad) {
-    updateVisualization(firstGamepad)
-  }
+  // Update visualizations for all connected gamepads
+  updateVisualizations(gamepads)
 
   animationFrameId = requestAnimationFrame(pollGamepads)
 }
@@ -752,7 +770,7 @@ onUnmounted(() => {
       <h3>Troubleshooting Common Issues</h3>
       <div class="about-content">
         <p><strong>Controller not detected:</strong> If your joystick isn't appearing, make sure it's properly connected and recognized by Windows. Open "Set up USB game controllers" in Windows settings to verify. Try unplugging and reconnecting the device, then refresh this page.</p>
-        <p><strong>Axes only registering positive values (Sidewinder X2, rudder issues):</strong> This configurator now includes automatic axis calibration! Before configuring, move all your axes, throttles, and rudders through their full range of motion. The tool will automatically detect and adjust for axes that don't center at zero. This fixes common issues with joysticks like the Sidewinder X2 where the rudder only registers 0 to +11 instead of negative to positive values.</p>
+        <p><strong>Axes only registering positive values (Sidewinder X2, rudder issues):</strong> Some joysticks have axes that don't properly center at zero - for example, the Microsoft Sidewinder X2's rudder axis ranges from 0 to +11 instead of -5 to +5. If you're experiencing this issue, enable "Axis Calibration" mode during configuration. Move all your axes through their full range of motion, and the tool will automatically learn and adjust for offset center points. This is only needed for problematic joysticks - most modern controllers work fine without calibration.</p>
         <p><strong>HAT switch not working:</strong> Some HAT switches are detected as axes rather than buttons. Enable "HAT Mode" in the configurator for better detection. HAT switches typically output discrete values (often -1, 0, or +1) rather than smooth analog ranges.</p>
         <p><strong>Axis inverted or wrong direction:</strong> Reforger allows you to invert axes in-game. If your control feels backward after configuration, check the game's control settings for invert options rather than reconfiguring here.</p>
         <p><strong>Too sensitive or not sensitive enough:</strong> Axis sensitivity and dead zones can be adjusted within Arma Reforger's control settings. Start with your hardware configured here, then fine-tune sensitivity curves in-game for optimal feel.</p>
@@ -789,17 +807,6 @@ onUnmounted(() => {
     </div>
 
     <div class="config-section">
-      <div class="calibration-notice">
-        <h3>📍 Important: Calibrate Your Axes First</h3>
-        <p><strong>Before clicking "Start Configuring":</strong></p>
-        <ol>
-          <li>Move <strong>all</strong> your joystick axes through their full range of motion</li>
-          <li>Move throttles from minimum to maximum</li>
-          <li>Press pedals or twist rudder through full left and right</li>
-          <li>Move all HAT switches in all directions</li>
-        </ol>
-        <p class="calibration-why">This helps the tool understand your joystick's natural center points and ranges, fixing issues where axes don't properly center at zero (like the Sidewinder X2 rudder problem).</p>
-      </div>
       <div class="config-controls">
         <button @click="triggerFileInput" class="btn btn-secondary">Load Existing Config</button>
         <input type="file" id="config-file-input" accept=".conf" style="display: none;" @change="handleLoadConfig">
@@ -851,6 +858,14 @@ onUnmounted(() => {
               <input type="checkbox" v-model="hatModeEnabled">
               <span>HAT Mode (simplified axis detection)</span>
             </label>
+            <label class="hat-mode-label">
+              <input type="checkbox" v-model="calibrationModeEnabled">
+              <span>Axis Calibration (for offset axes like Sidewinder X2 rudder)</span>
+            </label>
+          </div>
+
+          <div v-if="calibrationModeEnabled" class="calibration-instructions">
+            <p><strong>📍 Calibration Mode Active:</strong> Move all your axes through their full range of motion (throttles min to max, rudder full left to right, stick all directions) before configuring actions. This helps the tool learn your joystick's natural center points.</p>
           </div>
 
           <div class="action-controls">
@@ -865,26 +880,38 @@ onUnmounted(() => {
           <div class="joystick-visualization">
             <div class="viz-header">
               <h3>Live Input Monitor</h3>
-              <span class="viz-device-name">{{ vizDeviceName }}</span>
             </div>
-            <div class="viz-content">
-              <div class="viz-axes">
-                <div v-for="(value, index) in vizAxesValues" :key="`axis-${index}`" class="viz-axis">
-                  <span class="viz-axis-label">Axis {{ index }}</span>
-                  <div class="viz-axis-bar-container">
-                    <div class="viz-axis-center-line"></div>
-                    <div class="viz-axis-bar" :class="{ active: Math.abs(value) > 0.1 }" :style="{
-                      left: value < 0 ? `${((value + 1) / 2) * 100}%` : '50%',
-                      width: value < 0 ? `${(50 - ((value + 1) / 2) * 100)}%` : `${(((value + 1) / 2) - 0.5) * 100}%`
-                    }"></div>
-                  </div>
-                  <span class="viz-axis-value">{{ value.toFixed(2) }}</span>
-                </div>
+            <div v-if="gamepadVisualizations.length === 0" class="viz-no-devices">
+              <p>No joysticks detected. Connect a joystick and press any button.</p>
+            </div>
+            <div v-for="gamepadViz in gamepadVisualizations" :key="gamepadViz.index" class="viz-gamepad">
+              <div class="viz-gamepad-header">
+                <span class="viz-device-number">Device {{ gamepadViz.index }}</span>
+                <span class="viz-device-name">{{ gamepadViz.name }}</span>
               </div>
-              <div class="viz-buttons">
-                <div v-for="(pressed, index) in vizButtonsPressed" :key="`button-${index}`"
-                     class="viz-button" :class="{ active: pressed }">
-                  {{ index }}
+              <div class="viz-content">
+                <div class="viz-axes">
+                  <div v-for="(value, axisIndex) in gamepadViz.axes" :key="`device-${gamepadViz.index}-axis-${axisIndex}`" class="viz-axis">
+                    <span class="viz-axis-label">
+                      <span class="viz-device-badge">{{ gamepadViz.index }}</span>
+                      Axis {{ axisIndex }}
+                    </span>
+                    <div class="viz-axis-bar-container">
+                      <div class="viz-axis-center-line"></div>
+                      <div class="viz-axis-bar" :class="{ active: Math.abs(value) > 0.1 }" :style="{
+                        left: value < 0 ? `${((value + 1) / 2) * 100}%` : '50%',
+                        width: value < 0 ? `${(50 - ((value + 1) / 2) * 100)}%` : `${(((value + 1) / 2) - 0.5) * 100}%`
+                      }"></div>
+                    </div>
+                    <span class="viz-axis-value">{{ value.toFixed(2) }}</span>
+                  </div>
+                </div>
+                <div class="viz-buttons">
+                  <div v-for="(pressed, btnIndex) in gamepadViz.buttons" :key="`device-${gamepadViz.index}-button-${btnIndex}`"
+                       class="viz-button" :class="{ active: pressed }">
+                    <span class="viz-button-device">{{ gamepadViz.index }}</span>
+                    <span class="viz-button-number">{{ btnIndex }}</span>
+                  </div>
                 </div>
               </div>
             </div>

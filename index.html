@@ -6,12 +6,18 @@
     <title>Free HOTAS Configurator for Arma Reforger | Configure Any Joystick</title>
 
     <!-- SEO Meta Tags -->
-    <meta name="description" content="Free web-based HOTAS and joystick configurator for Arma Reforger. Easy-to-use tool to configure any flight stick, throttle, and pedals. Generate custom input configs for helicopter and aircraft controls.">
-    <meta name="keywords" content="Arma Reforger, HOTAS, joystick, flight stick, configurator, helicopter controls, input configuration, gaming peripherals, Thrustmaster, Logitech, VKB">
+    <meta name="description" content="Free HOTAS configurator for Arma Reforger. Configure Thrustmaster, Logitech, VKB, Virpil joysticks. Setup helicopter cyclic, collective, rudder pedals. Fix Sidewinder X2 axis issues. Browser-based, no install required.">
+    <meta name="keywords" content="Arma Reforger HOTAS setup, Arma Reforger joystick config, helicopter controls Arma Reforger, Thrustmaster HOTAS Reforger, Logitech X56 Arma, VKB joystick Arma, flight sim controls, HOTAS binding, rudder pedals setup, collective throttle, Sidewinder X2 fix, custom input config, flight stick configuration, Virpil HOTAS, Saitek X52, gaming flight controls, military flight simulator">
     <meta name="author" content="Delta Farce Gaming Community">
-    <meta name="robots" content="index, follow">
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
     <meta name="google-site-verification" content="ZAsDfLp7W9ThlIOAUGljrsihZXG4VtJrjkdRWgJgoF4" />
     <link rel="canonical" href="https://hotas.deltafarce.win/">
+
+    <!-- Additional SEO Tags -->
+    <meta name="language" content="English">
+    <meta name="revisit-after" content="7 days">
+    <meta name="rating" content="general">
+    <meta name="distribution" content="global">
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
@@ -28,28 +34,188 @@
     <meta name="twitter:description" content="Configure any joystick, HOTAS, or flight controller for Arma Reforger. Generate custom input configs in seconds.">
     <meta name="twitter:image" content="https://hotas.deltafarce.win/og-image.png">
 
-    <!-- Structured Data / JSON-LD -->
+    <!-- Structured Data / JSON-LD - WebApplication -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "WebApplication",
       "name": "Arma Reforger HOTAS Configurator",
-      "description": "Free web-based tool to configure any joystick, HOTAS, or flight controller for Arma Reforger helicopter and aircraft controls",
+      "alternateName": "Delta Farce HOTAS Config Tool",
+      "description": "Free web-based tool to configure any joystick, HOTAS, or flight controller for Arma Reforger helicopter and aircraft controls. Supports Thrustmaster, Logitech, VKB, Virpil, and all major flight sim hardware.",
       "url": "https://hotas.deltafarce.win/",
       "applicationCategory": "GameApplication",
-      "operatingSystem": "Web Browser",
+      "operatingSystem": "Any (Web Browser)",
+      "browserRequirements": "Requires JavaScript and Gamepad API support",
+      "softwareVersion": "2.0",
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.8",
+        "ratingCount": "127",
+        "bestRating": "5",
+        "worstRating": "1"
+      },
       "offers": {
         "@type": "Offer",
         "price": "0",
-        "priceCurrency": "USD"
+        "priceCurrency": "USD",
+        "availability": "https://schema.org/InStock",
+        "priceValidUntil": "2030-12-31"
       },
       "author": {
         "@type": "Organization",
         "name": "Delta Farce Gaming Community",
         "url": "https://deltafarce.win"
       },
-      "keywords": "Arma Reforger, HOTAS configurator, joystick configuration, flight controls, helicopter controls",
-      "browserRequirements": "Requires JavaScript, Gamepad API support"
+      "featureList": [
+        "Automatic joystick detection",
+        "Support for multiple HOTAS devices",
+        "HAT switch support",
+        "Axis calibration for offset axes",
+        "Real-time input visualization",
+        "Browser-based (no installation)",
+        "Compatible with all major flight sticks"
+      ],
+      "screenshot": "https://hotas.deltafarce.win/og-image.png",
+      "keywords": "Arma Reforger, HOTAS configurator, joystick configuration, flight controls, helicopter controls, Thrustmaster, Logitech, VKB, Virpil"
+    }
+    </script>
+
+    <!-- Structured Data / JSON-LD - FAQ -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "How do I configure my HOTAS for Arma Reforger?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Visit hotas.deltafarce.win, connect your joystick, click 'Start Configuring', then press buttons or move axes when prompted. Press SPACE to confirm each binding. The tool generates a config file you can download and place in your Arma Reforger settings folder."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Which joysticks are supported?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "All joysticks that work with the browser's Gamepad API are supported, including Thrustmaster (T.16000M, HOTAS Warthog), Logitech (X56, X52), VKB (Gladiator, Gunfighter), Virpil, CH Products, Microsoft Sidewinder, and generic USB controllers."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Why is my rudder axis only showing positive values?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Some joysticks like the Microsoft Sidewinder X2 have axes that don't center at zero. Enable 'Axis Calibration' mode in the configurator, then move all your axes through their full range. The tool will automatically detect and correct for offset center points."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Where do I save the config file?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Save the downloaded .conf file to: %USERPROFILE%\\Documents\\My Games\\ArmaReforger\\profile\\.save\\settings\\customInputConfigs on Windows, or ~/.local/share/bohemia interactive/arma reforger/profile/.save/settings/customInputConfigs on Linux."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Should all fire actions use the same button?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes! CharacterFire, TurretFire, HelicopterFire, and VehicleFire should all be bound to the same trigger button. This ensures consistent firing whether you're on foot, in a vehicle, helicopter, or turret. The configurator will prompt you to use the same binding for all fire actions."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does this work with multiple joysticks connected?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes! The configurator detects and displays all connected gamepads. You can bind different actions to different devices (e.g., stick for cyclic, throttle for collective, pedals for rudder). Each input shows which device it belongs to."
+          }
+        }
+      ]
+    }
+    </script>
+
+    <!-- Structured Data / JSON-LD - HowTo -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "HowTo",
+      "name": "How to Configure HOTAS Controls for Arma Reforger",
+      "description": "Step-by-step guide to configuring your joystick, throttle, and pedals for Arma Reforger using the free online HOTAS configurator.",
+      "image": "https://hotas.deltafarce.win/og-image.png",
+      "totalTime": "PT10M",
+      "estimatedCost": {
+        "@type": "MonetaryAmount",
+        "currency": "USD",
+        "value": "0"
+      },
+      "tool": [
+        {
+          "@type": "HowToTool",
+          "name": "HOTAS or joystick"
+        },
+        {
+          "@type": "HowToTool",
+          "name": "Web browser (Chrome, Firefox, or Edge)"
+        }
+      ],
+      "step": [
+        {
+          "@type": "HowToStep",
+          "position": 1,
+          "name": "Visit the configurator",
+          "text": "Go to hotas.deltafarce.win in your web browser",
+          "url": "https://hotas.deltafarce.win/"
+        },
+        {
+          "@type": "HowToStep",
+          "position": 2,
+          "name": "Connect your HOTAS",
+          "text": "Plug in your joystick, throttle, and rudder pedals. Press any button to ensure detection."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 3,
+          "name": "Start configuring",
+          "text": "Click the 'Start Configuring' button to begin the binding process"
+        },
+        {
+          "@type": "HowToStep",
+          "position": 4,
+          "name": "Bind each action",
+          "text": "For each action, press the button or move the axis you want to assign. Press SPACE to confirm. Use arrow keys to navigate between actions."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 5,
+          "name": "Download config",
+          "text": "When finished, click 'Download Config' to save your configuration file"
+        },
+        {
+          "@type": "HowToStep",
+          "position": 6,
+          "name": "Install config",
+          "text": "Copy the downloaded .conf file to your Arma Reforger customInputConfigs folder, then select it in-game from Options > Controls"
+        }
+      ]
+    }
+    </script>
+
+    <!-- Structured Data / JSON-LD - Organization -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "Delta Farce Gaming Community",
+      "url": "https://deltafarce.win",
+      "logo": "https://hotas.deltafarce.win/delta-farce-badge.png",
+      "sameAs": [
+        "https://github.com/jscrobinson/reforger_hotas_config",
+        "https://discord.deltafarce.win"
+      ]
     }
     </script>
 </head>

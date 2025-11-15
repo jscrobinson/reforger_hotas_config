@@ -1184,6 +1184,82 @@ header h1 {
     font-weight: 900;
 }
 
+.fire-action-notice {
+    display: flex;
+    gap: 15px;
+    margin: 20px 0;
+    padding: 20px;
+    background: linear-gradient(135deg, rgba(255, 87, 34, 0.1) 0%, rgba(244, 67, 54, 0.1) 100%);
+    border: 3px solid #FF5722;
+    border-left: 8px solid #FF5722;
+    border-radius: 0;
+    animation: pulse-border 2s ease-in-out infinite;
+}
+
+@keyframes pulse-border {
+    0%, 100% {
+        border-color: #FF5722;
+        box-shadow: 0 0 0 rgba(255, 87, 34, 0);
+    }
+    50% {
+        border-color: #F4511E;
+        box-shadow: 0 0 20px rgba(255, 87, 34, 0.3);
+    }
+}
+
+.fire-action-icon {
+    font-size: 2.5em;
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+.fire-action-content {
+    flex: 1;
+}
+
+.fire-action-content strong {
+    display: block;
+    color: #FF5722;
+    font-size: 1.1em;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+}
+
+.fire-action-content > p {
+    color: #ecf0f1;
+    line-height: 1.6;
+    margin-bottom: 12px;
+    font-size: 0.95em;
+}
+
+.fire-action-suggestion {
+    margin-top: 15px;
+    padding: 15px;
+    background: rgba(76, 175, 80, 0.15);
+    border: 2px solid #4CAF50;
+    border-left: 4px solid #4CAF50;
+    border-radius: 0;
+}
+
+.fire-action-suggestion p {
+    color: #4CAF50;
+    font-weight: 600;
+    margin-bottom: 10px;
+    font-size: 0.95em;
+}
+
+.fire-action-suggestion strong {
+    color: #66BB6A;
+    font-weight: 900;
+}
+
+.btn-small {
+    padding: 8px 16px;
+    font-size: 0.9em;
+}
+
 .action-controls {
     display: flex;
     gap: 10px;

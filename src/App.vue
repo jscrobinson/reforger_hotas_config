@@ -17,12 +17,14 @@ const ACTIONS: Omit<Action, 'binding'>[] = [
   { name: 'HelicopterAutohoverToggle', filterPreset: 'click', hint: 'Auto-hover stabilization', hardware: 'button', importance: 'important' },
   { name: 'HelicopterLightsTaxiToggle', filterPreset: 'toggle', hint: 'Taxi lights (ground operations)', hardware: 'switch', importance: 'optional' },
   { name: 'HelicopterLightsLandingToggle', filterPreset: 'toggle', hint: 'Landing lights (approach)', hardware: 'switch', importance: 'optional' },
+  { name: 'CharacterFire', filterPreset: 'hold', hint: 'Fire primary weapon (use same trigger as all fire actions)', hardware: 'trigger', importance: 'critical' },
+  { name: 'TurretFire', filterPreset: 'hold', hint: 'Fire turret weapon (use same trigger as all fire actions)', hardware: 'trigger', importance: 'important' },
+  { name: 'HelicopterFire', filterPreset: 'hold', hint: 'Fire heli weapon (use same trigger as all fire actions)', hardware: 'trigger', importance: 'important' },
+  { name: 'VehicleFire', filterPreset: 'hold', hint: 'Fire vehicle weapon (use same trigger as all fire actions)', hardware: 'trigger', importance: 'important' },
   { name: 'WeaponToggleSightsIllumination', filterPreset: 'click', hint: 'Toggle reticle illumination', hardware: 'button', importance: 'optional' },
   { name: 'WeaponSwitchOptics', filterPreset: 'click', hint: 'Change zoom/magnification', hardware: 'button', importance: 'important' },
   { name: 'CharacterNextWeapon', filterPreset: 'click', hint: 'Switch to next weapon', hardware: 'hat', importance: 'important' },
-  { name: 'CharacterFire', filterPreset: 'hold', hint: 'Fire primary weapon', hardware: 'trigger', importance: 'critical' },
   { name: 'CharacterNextFireMode', filterPreset: 'click', hint: 'Change fire mode (single/burst/auto)', hardware: 'button', importance: 'important' },
-  { name: 'TurretFire', filterPreset: 'hold', hint: 'Fire turret weapon', hardware: 'trigger', importance: 'important' },
   { name: 'TurretReload', filterPreset: 'click', hint: 'Reload turret weapon', hardware: 'button', importance: 'important' },
   { name: 'TurretNextWeapon', filterPreset: 'click', hint: 'Cycle turret weapons', hardware: 'hat', importance: 'important' },
   { name: 'TurretNextFireMode', filterPreset: 'click', hint: 'Change turret fire mode', hardware: 'button', importance: 'optional' },
@@ -126,6 +128,24 @@ const resumeActionNumber = computed(() => {
 
 const isConfigurationComplete = computed(() => {
   return configuredCount.value === state.actions.length && configuredCount.value > 0
+})
+
+// Fire action helpers
+const FIRE_ACTION_NAMES = ['CharacterFire', 'TurretFire', 'HelicopterFire', 'VehicleFire']
+
+const isCurrentActionFireAction = computed(() => {
+  if (!currentAction.value) return false
+  return FIRE_ACTION_NAMES.includes(currentAction.value.name)
+})
+
+const configuredFireActions = computed(() => {
+  return state.actions.filter(action =>
+    FIRE_ACTION_NAMES.includes(action.name) && action.binding !== null
+  )
+})
+
+const firstConfiguredFireAction = computed(() => {
+  return configuredFireActions.value.length > 0 ? configuredFireActions.value[0] : null
 })
 
 // Methods
@@ -238,6 +258,19 @@ function clearCurrentActionBinding() {
     state.pendingInput = null
     state.inputCooldown = false
     resetGamepadBaseline()
+  }
+}
+
+function copyFireActionBinding() {
+  if (currentAction.value && firstConfiguredFireAction.value) {
+    currentAction.value.binding = firstConfiguredFireAction.value.binding
+    state.pendingInput = null
+    state.inputCooldown = true
+    setTimeout(() => {
+      state.inputCooldown = false
+      resetGamepadBaseline()
+      nextAction()
+    }, 300)
   }
 }
 
@@ -494,11 +527,13 @@ function handleKeyDown(event: KeyboardEvent) {
 }
 
 function generateGUID(): string {
-  return '{' + 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-    const r = Math.random() * 16 | 0
-    const v = c === 'x' ? r : (r & 0x3 | 0x8)
-    return v.toString(16).toUpperCase()
-  }) + '}'
+  // Generate 16 character alphanumeric (hex) value
+  let result = ''
+  const hexChars = '0123456789ABCDEF'
+  for (let i = 0; i < 16; i++) {
+    result += hexChars.charAt(Math.floor(Math.random() * 16))
+  }
+  return result
 }
 
 function generateConfig(): string {
@@ -846,6 +881,22 @@ onUnmounted(() => {
           </div>
           <div class="action-prompt">Press any button or move any axis</div>
           <div class="action-hint">Use ↑↓ arrows or click to navigate actions • Enable HAT Mode for difficult HAT switches</div>
+
+          <!-- Fire Action Notice -->
+          <div v-if="isCurrentActionFireAction" class="fire-action-notice">
+            <div class="fire-action-icon">🎯</div>
+            <div class="fire-action-content">
+              <strong>Important: Fire Button Binding</strong>
+              <p>All fire actions (CharacterFire, TurretFire, HelicopterFire, VehicleFire) should be bound to the SAME trigger button. This ensures consistent firing across all vehicle types and on-foot combat.</p>
+              <div v-if="firstConfiguredFireAction && firstConfiguredFireAction.name !== currentAction?.name" class="fire-action-suggestion">
+                <p>✓ You already configured <strong>{{ formatActionName(firstConfiguredFireAction.name) }}</strong> to <strong>{{ firstConfiguredFireAction.binding }}</strong></p>
+                <button @click="copyFireActionBinding" class="btn btn-primary btn-small">
+                  Use Same Binding ({{ firstConfiguredFireAction.binding }})
+                </button>
+              </div>
+            </div>
+          </div>
+
           <div class="input-detection-container">
             <div class="input-detected" :class="{ 'has-input': state.pendingInput || currentAction?.binding }">
               <div v-if="!state.pendingInput && !currentAction?.binding" class="waiting-message">Waiting for input...</div>

@@ -2,6 +2,16 @@
 
 A browser-based configurator for setting up HOTAS (Hands On Throttle And Stick) controls in Arma Reforger.
 
+---
+
+## 🚀 **[Use the Online Tool Here →](https://hotas.deltafarce.win)**
+
+**Don't download the files!** The configurator is ready to use online at [https://hotas.deltafarce.win](https://hotas.deltafarce.win)
+
+No installation needed - just connect your joystick and start configuring in your browser.
+
+---
+
 ## Features
 
 - **Browser-Based**: No installation required - runs entirely in your web browser
@@ -15,7 +25,7 @@ A browser-based configurator for setting up HOTAS (Hands On Throttle And Stick) 
 
 ## Quick Start
 
-1. Open `index.html` in a modern web browser (Chrome, Edge, Firefox)
+1. Visit **[https://hotas.deltafarce.win](https://hotas.deltafarce.win)** in your browser
 2. Connect your HOTAS/joystick
 3. Click **"Start Configuring"**
 4. Follow the prompts to assign each action
@@ -93,6 +103,17 @@ Contributions are welcome! Feel free to:
 - Submit pull requests
 - Share feedback
 
+### Running Locally for Development
+
+If you want to contribute or run the configurator locally:
+
+1. Clone this repository
+2. Install dependencies: `npm install`
+3. Run dev server: `npm run dev`
+4. Build for production: `npm run build`
+
+The configurator is built with Vue 3 + TypeScript + Vite.
+
 ## License
 
 MIT License - feel free to use and modify for your own projects.
@@ -103,6 +124,7 @@ Created for the Arma Reforger community to make HOTAS configuration easier.
 
 ## Links
 
+- **[HOTAS Configurator (Online Tool)](https://hotas.deltafarce.win)** ← Use this!
 - [Arma Reforger Input Manager Wiki](https://community.bistudio.com/wiki/Arma_Reforger:Input_Manager)
 - [Arma Reforger Official Site](https://reforger.armaplatform.com/)
 

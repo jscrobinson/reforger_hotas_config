@@ -17,14 +17,13 @@ const ACTIONS: Omit<Action, 'binding'>[] = [
   { name: 'HelicopterAutohoverToggle', filterPreset: 'click', hint: 'Auto-hover stabilization', hardware: 'button', importance: 'important' },
   { name: 'HelicopterLightsTaxiToggle', filterPreset: 'toggle', hint: 'Taxi lights (ground operations)', hardware: 'switch', importance: 'optional' },
   { name: 'HelicopterLightsLandingToggle', filterPreset: 'toggle', hint: 'Landing lights (approach)', hardware: 'switch', importance: 'optional' },
+  { name: 'HelicopterEngineStart', filterPreset: 'hold', hint: 'Start engine and rotors', hardware: 'button', importance: 'critical' },
+  { name: 'HelicopterEngineStop', filterPreset: 'click', hint: 'Stop engine and rotors', hardware: 'button', importance: 'critical' },
   { name: 'CharacterFire', filterPreset: 'hold', hint: 'Fire primary weapon (use same trigger as all fire actions)', hardware: 'trigger', importance: 'critical' },
-  { name: 'TurretFire', filterPreset: 'hold', hint: 'Fire turret weapon (use same trigger as all fire actions)', hardware: 'trigger', importance: 'important' },
-  { name: 'HelicopterFire', filterPreset: 'hold', hint: 'Fire heli weapon (use same trigger as all fire actions)', hardware: 'trigger', importance: 'important' },
-  { name: 'VehicleFire', filterPreset: 'hold', hint: 'Fire vehicle weapon (use same trigger as all fire actions)', hardware: 'trigger', importance: 'important' },
-  { name: 'WeaponToggleSightsIllumination', filterPreset: 'click', hint: 'Toggle reticle illumination', hardware: 'button', importance: 'optional' },
-  { name: 'WeaponSwitchOptics', filterPreset: 'click', hint: 'Change zoom/magnification', hardware: 'button', importance: 'important' },
   { name: 'CharacterNextWeapon', filterPreset: 'click', hint: 'Switch to next weapon', hardware: 'hat', importance: 'important' },
   { name: 'CharacterNextFireMode', filterPreset: 'click', hint: 'Change fire mode (single/burst/auto)', hardware: 'button', importance: 'important' },
+  { name: 'CharacterNextMuzzle', filterPreset: 'click', hint: 'Switch muzzle attachment or barrel', hardware: 'button', importance: 'optional' },
+  { name: 'TurretFire', filterPreset: 'hold', hint: 'Fire turret weapon (use same trigger as all fire actions)', hardware: 'trigger', importance: 'important' },
   { name: 'TurretReload', filterPreset: 'click', hint: 'Reload turret weapon', hardware: 'button', importance: 'important' },
   { name: 'TurretNextWeapon', filterPreset: 'click', hint: 'Cycle turret weapons', hardware: 'hat', importance: 'important' },
   { name: 'TurretNextFireMode', filterPreset: 'click', hint: 'Change turret fire mode', hardware: 'button', importance: 'optional' },
@@ -36,10 +35,24 @@ const ACTIONS: Omit<Action, 'binding'>[] = [
   { name: 'TurretAimDown', filterPreset: 'down', hint: 'Depress turret down', hardware: 'stick', importance: 'important' },
   { name: 'TurretAimLeft', filterPreset: 'left', hint: 'Fine aim left', hardware: 'stick', importance: 'optional' },
   { name: 'TurretAimRight', filterPreset: 'right', hint: 'Fine aim right', hardware: 'stick', importance: 'optional' },
+  { name: 'HelicopterFire', filterPreset: 'hold', hint: 'Fire heli weapon (use same trigger as all fire actions)', hardware: 'trigger', importance: 'important' },
+  { name: 'VehicleFire', filterPreset: 'hold', hint: 'Fire vehicle weapon (use same trigger as all fire actions)', hardware: 'trigger', importance: 'important' },
+  { name: 'WeaponToggleSightsIllumination', filterPreset: 'click', hint: 'Toggle reticle illumination', hardware: 'button', importance: 'optional' },
+  { name: 'WeaponSwitchOptics', filterPreset: 'click', hint: 'Change zoom/magnification', hardware: 'button', importance: 'important' },
+  { name: 'FocusToggle', filterPreset: 'click', hint: 'Toggle focused aim/scope', hardware: 'button', importance: 'optional' },
+  { name: 'Freelook', filterPreset: 'hold', hint: 'Hold to look around freely', hardware: 'button', importance: 'important' },
+  { name: 'FreelookReset', filterPreset: 'click', hint: 'Reset view to center', hardware: 'button', importance: 'optional' },
+  { name: 'FreelookUp', filterPreset: 'up', hint: 'Look up', hardware: 'hat', importance: 'optional' },
+  { name: 'FreelookDown', filterPreset: 'down', hint: 'Look down', hardware: 'hat', importance: 'optional' },
+  { name: 'FreelookLeft', filterPreset: 'left', hint: 'Look left', hardware: 'hat', importance: 'optional' },
+  { name: 'FreelookRight', filterPreset: 'right', hint: 'Look right', hardware: 'hat', importance: 'optional' },
+  { name: 'VONDirectToggle', filterPreset: 'click', hint: 'Toggle voice chat (push-to-talk)', hardware: 'button', importance: 'important' },
+  { name: 'VONChannel', filterPreset: 'hold', hint: 'Hold to talk on radio channel', hardware: 'button', importance: 'important' },
+  { name: 'GadgetMap', filterPreset: 'select', hint: 'Open/close map', hardware: 'button', importance: 'important' },
+  { name: 'PerformAction', filterPreset: 'pressed', hint: 'Context action (interact, reload, etc.)', hardware: 'button', importance: 'important' },
+  { name: 'SelectAction', filterPreset: 'previous', hint: 'Cycle through available actions', hardware: 'button', importance: 'optional' },
   { name: 'GetOut', filterPreset: 'click', hint: 'Exit vehicle safely', hardware: 'button', importance: 'important' },
   { name: 'JumpOut', filterPreset: 'click', hint: 'Emergency eject (dangerous!)', hardware: 'button', importance: 'optional' },
-  { name: 'HelicopterEngineStart', filterPreset: 'hold', hint: 'Start engine and rotors', hardware: 'button', importance: 'critical' },
-  { name: 'HelicopterEngineStop', filterPreset: 'click', hint: 'Stop engine and rotors', hardware: 'button', importance: 'critical' },
   { name: 'WCS_Armament_DeployFlares', filterPreset: 'hold', hint: 'Deploy Flares (WCS Armaments)', hardware: 'button', importance: 'optional' }
 ]
 
@@ -683,6 +696,21 @@ function triggerFileInput() {
   input?.click()
 }
 
+async function loadVanillaConfig(filename: string) {
+  try {
+    const response = await fetch(`/vanilla_configs/${filename}`)
+    if (!response.ok) {
+      throw new Error(`Failed to load config: ${response.statusText}`)
+    }
+    const configText = await response.text()
+    parseConfig(configText)
+    alert(`Vanilla config "${filename}" loaded successfully! You can now modify the bindings or download as-is.`)
+  } catch (error: any) {
+    alert('Error loading vanilla config: ' + error.message)
+    console.error('Vanilla config load error:', error)
+  }
+}
+
 // Lifecycle
 onMounted(() => {
   document.addEventListener('keydown', handleKeyDown)
@@ -746,8 +774,17 @@ onUnmounted(() => {
             <p>Plug in your controller and press any button. It should appear in the "Connected Joysticks" section above.</p>
           </li>
           <li>
-            <strong>Start Configuring</strong>
-            <p>Click "Start Configuring" and follow the prompts. For each action, press the button or move the axis you want to assign, then press SPACE to confirm.</p>
+            <strong>Choose Your Starting Point</strong>
+            <p>You have three options:</p>
+            <ul>
+              <li><strong>Load a Vanilla Config Template:</strong> Start with an official Arma Reforger config for Logitech Extreme 3D Pro or Saitek X56 HOTAS and customize it</li>
+              <li><strong>Load Your Own Config:</strong> Upload an existing config file you've created or downloaded</li>
+              <li><strong>Start From Scratch:</strong> Create a completely new configuration by binding each action yourself</li>
+            </ul>
+          </li>
+          <li>
+            <strong>Configure Actions</strong>
+            <p>If starting from scratch or modifying bindings, click "Start Configuring" and follow the prompts. For each action, press the button or move the axis you want to assign, then press SPACE to confirm.</p>
           </li>
           <li>
             <strong>Use HAT Mode for Tricky Controls</strong>
@@ -774,9 +811,10 @@ onUnmounted(() => {
       <div class="tips-box">
         <h4>💡 Pro Tips</h4>
         <ul>
+          <li>Start with a vanilla config template if you have a similar joystick - it's much faster than configuring from scratch</li>
           <li>You can skip actions you don't need by clicking "Skip"</li>
           <li>Use the action list on the right to jump to specific actions</li>
-          <li>You can load an existing config file and modify it instead of starting from scratch</li>
+          <li>Load an existing config file and modify only the bindings you want to change</li>
           <li>Test your bindings in-game and come back to adjust if needed</li>
         </ul>
       </div>
@@ -846,8 +884,21 @@ onUnmounted(() => {
     </div>
 
     <div class="config-section">
+      <div class="vanilla-configs-section">
+        <h3>Load Vanilla Config Templates</h3>
+        <p class="vanilla-hint">Start with an official Arma Reforger config and customize it to your needs</p>
+        <div class="vanilla-configs-buttons">
+          <button @click="loadVanillaConfig('Joystick_LogitechExtreme3DPro_0.conf')" class="btn btn-vanilla">
+            Logitech Extreme 3D Pro
+          </button>
+          <button @click="loadVanillaConfig('Joystick_SaitekProFlightX56Rhino_0_Stick_1_Throttle.conf')" class="btn btn-vanilla">
+            Saitek X56 HOTAS
+          </button>
+        </div>
+      </div>
+
       <div class="config-controls">
-        <button @click="triggerFileInput" class="btn btn-secondary">Load Existing Config</button>
+        <button @click="triggerFileInput" class="btn btn-secondary">Load Your Own Config</button>
         <input type="file" id="config-file-input" accept=".conf" style="display: none;" @change="handleLoadConfig">
         <button @click="startConfiguration" :disabled="state.configuring" class="btn btn-primary">Start Configuring</button>
         <button @click="downloadConfig" :disabled="configuredCount === 0" class="btn btn-success" :class="{ 'btn-pulse': isConfigurationComplete }">

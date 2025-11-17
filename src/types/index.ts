@@ -1,5 +1,6 @@
 export type FilterPreset =
   | 'pressed'
+  | 'previous'
   | 'next'
   | 'click'
   | 'hold'

@@ -39,7 +39,8 @@ const ACTIONS: Omit<Action, 'binding'>[] = [
   { name: 'GetOut', filterPreset: 'click', hint: 'Exit vehicle safely', hardware: 'button', importance: 'important' },
   { name: 'JumpOut', filterPreset: 'click', hint: 'Emergency eject (dangerous!)', hardware: 'button', importance: 'optional' },
   { name: 'HelicopterEngineStart', filterPreset: 'hold', hint: 'Start engine and rotors', hardware: 'button', importance: 'critical' },
-  { name: 'HelicopterEngineStop', filterPreset: 'click', hint: 'Stop engine and rotors', hardware: 'button', importance: 'critical' }
+  { name: 'HelicopterEngineStop', filterPreset: 'click', hint: 'Stop engine and rotors', hardware: 'button', importance: 'critical' },
+  { name: 'WCS_Armament_DeployFlares', filterPreset: 'hold', hint: 'Deploy Flares (WCS Armaments)', hardware: 'button', importance: 'optional' }
 ]
 
 // Axis calibration data
@@ -150,7 +151,7 @@ const firstConfiguredFireAction = computed(() => {
 
 // Methods
 function formatActionName(name: string): string {
-  return name.replace(/([A-Z])/g, ' $1').trim()
+  return name.replace(/_/g, "").replace(/([A-Z]([^A-Z]))/g, ' $1').trim()
 }
 
 // Utility function to describe input in human-readable form (currently unused but kept for future use)

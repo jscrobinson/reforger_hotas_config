@@ -855,16 +855,6 @@ onUnmounted(() => {
       </div>
     </div>
 
-    <!-- Ad: Top Banner -->
-    <div class="ad-container">
-      <Adsense
-        data-ad-client="ca-pub-8117946503724556"
-        data-ad-slot="8517600527"
-        data-ad-format="auto"
-        data-full-width-responsive="true">
-      </Adsense>
-    </div>
-
     <!-- Configurator Tool Section -->
     <div id="configurator"></div>
 
@@ -1060,16 +1050,6 @@ onUnmounted(() => {
         </div>
       </div>
 
-    </div>
-
-    <!-- Ad: Bottom Banner - Only show when user has engaged with the tool -->
-    <div v-if="configuredCount > 0 || state.furthestActionIndex > 0" class="ad-container ad-bottom">
-      <Adsense
-        data-ad-client="ca-pub-8117946503724556"
-        data-ad-slot="8517600527"
-        data-ad-format="auto"
-        data-full-width-responsive="true">
-      </Adsense>
     </div>
 
     <!-- Footer -->

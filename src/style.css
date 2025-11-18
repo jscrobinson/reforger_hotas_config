@@ -470,6 +470,22 @@ header h1 {
     border: 1px solid #4a5d23;
 }
 
+.instruction-list li ul {
+    list-style: disc;
+    margin: 10px 0;
+    padding-left: 20px;
+}
+
+.instruction-list li ul li {
+    counter-increment: none;
+    padding-left: 0;
+    margin-bottom: 8px;
+}
+
+.instruction-list li ul li::before {
+    display: none;
+}
+
 .tips-box {
     background: rgba(74, 93, 35, 0.25);
     border-left: 4px solid #d4af37;

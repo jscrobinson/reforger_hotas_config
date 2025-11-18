@@ -2,6 +2,13 @@
 import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
 import type { Action, AppState, GamepadState } from './types'
 
+// Google Analytics gtag declaration
+declare global {
+  interface Window {
+    gtag?: (command: string, ...args: any[]) => void
+  }
+}
+
 // Action definitions with sensible FilterPreset defaults and hints
 const ACTIONS: Omit<Action, 'binding'>[] = [
   { name: 'HelicopterCollectiveIncrease', filterPreset: 'up', hint: 'Increase altitude (raise collective)', hardware: 'throttle', importance: 'critical' },
@@ -260,6 +267,18 @@ function startConfiguration() {
   state.furthestActionIndex = 0
   state.inputCooldown = false
   resetGamepadBaseline()
+
+  // Track Start Configuring event with connected joysticks
+  const joysticks = Object.values(state.connectedGamepads)
+  const joystickTypes = joysticks.map(j => j.id).join(', ') || 'None'
+
+  if (window.gtag) {
+    window.gtag('event', 'start_configuration', {
+      joystick_count: joysticks.length,
+      joystick_types: joystickTypes,
+      event_category: 'engagement'
+    })
+  }
 }
 
 function skipCurrentAction() {
@@ -553,6 +572,24 @@ function generateGUID(): string {
   return result
 }
 
+// Helper function to track config download
+function trackConfigDownload() {
+  const joysticks = Object.values(state.connectedGamepads)
+  const joystickTypes = joysticks.map(j => j.id).join(', ') || 'None'
+  const configuredActionsCount = state.actions.filter(a => a.binding).length
+
+  if (window.gtag) {
+    window.gtag('event', 'download_config', {
+      joystick_count: joysticks.length,
+      joystick_types: joystickTypes,
+      configured_actions: configuredActionsCount,
+      total_actions: state.actions.length,
+      completion_percentage: Math.round((configuredActionsCount / state.actions.length) * 100),
+      event_category: 'conversion'
+    })
+  }
+}
+
 function generateConfig(): string {
   let config = 'ActionManager {\n Actions {\n'
 
@@ -639,6 +676,7 @@ async function downloadConfig() {
       const writable = await handle.createWritable()
       await writable.write(config)
       await writable.close()
+      trackConfigDownload()
       return
     } catch (err: any) {
       if (err.name !== 'AbortError') {
@@ -656,6 +694,8 @@ async function downloadConfig() {
   a.click()
   document.body.removeChild(a)
   URL.revokeObjectURL(url)
+
+  trackConfigDownload()
 }
 
 function handleLoadConfig(event: Event) {
@@ -708,6 +748,14 @@ async function loadVanillaConfig(filename: string) {
     const configText = await response.text()
     parseConfig(configText)
     alert(`Vanilla config "${filename}" loaded successfully! You can now modify the bindings or download as-is.`)
+
+    // Track vanilla config load
+    if (window.gtag) {
+      window.gtag('event', 'load_vanilla_config', {
+        config_filename: filename,
+        event_category: 'engagement'
+      })
+    }
   } catch (error: any) {
     alert('Error loading vanilla config: ' + error.message)
     console.error('Vanilla config load error:', error)

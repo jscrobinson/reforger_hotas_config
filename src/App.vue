@@ -88,6 +88,9 @@ const axisCalibration = reactive<AxisCalibration>({})
 const hatModeEnabled = ref(false)
 const calibrationModeEnabled = ref(false)
 
+// Cookie consent state
+const showCookieConsent = ref(false)
+
 // Visualization data for all connected gamepads
 interface GamepadVisualization {
   index: number
@@ -711,10 +714,29 @@ async function loadVanillaConfig(filename: string) {
   }
 }
 
+// Cookie consent functions
+function checkCookieConsent() {
+  const consent = localStorage.getItem('cookieConsent')
+  if (!consent) {
+    showCookieConsent.value = true
+  }
+}
+
+function acceptCookies() {
+  localStorage.setItem('cookieConsent', 'accepted')
+  showCookieConsent.value = false
+}
+
+function declineCookies() {
+  localStorage.setItem('cookieConsent', 'declined')
+  showCookieConsent.value = false
+}
+
 // Lifecycle
 onMounted(() => {
   document.addEventListener('keydown', handleKeyDown)
   pollGamepads()
+  checkCookieConsent()
 })
 
 onUnmounted(() => {
@@ -726,6 +748,24 @@ onUnmounted(() => {
 </script>
 
 <template>
+  <!-- Cookie Consent Interstitial -->
+  <div v-if="showCookieConsent" class="cookie-consent-overlay">
+    <div class="cookie-consent-modal">
+      <div class="cookie-consent-header">
+        <span class="cookie-icon">🍪</span>
+        <h2>Cookie Notice</h2>
+      </div>
+      <div class="cookie-consent-content">
+        <p>This website uses cookies and similar technologies to enhance your browsing experience, analyze site traffic, and personalize content.</p>
+        <p>By clicking "Accept All Cookies", you consent to the storage of cookies on your device. You can choose to decline non-essential cookies.</p>
+      </div>
+      <div class="cookie-consent-actions">
+        <button @click="acceptCookies" class="btn btn-accept">Accept All Cookies</button>
+        <button @click="declineCookies" class="btn btn-decline">Decline Non-Essential</button>
+      </div>
+    </div>
+  </div>
+
   <div class="container">
     <header>
       <img src="/delta-farce-badge.png" alt="Delta Farce" class="header-badge" />

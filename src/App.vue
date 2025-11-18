@@ -817,7 +817,7 @@ onUnmounted(() => {
       <p class="subtitle">Configure your joystick inputs for Arma Reforger</p>
       <div class="header-cta">
         <a href="#configurator" class="btn-cta">Start Configuring Now →</a>
-        <p class="cta-subtext">Free tool • Works with any joystick • No installation required</p>
+        <p class="cta-subtext">Works with any joystick • No installation required</p>
       </div>
     </header>
 

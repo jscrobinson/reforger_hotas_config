@@ -748,20 +748,16 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <!-- Cookie Consent Interstitial -->
-  <div v-if="showCookieConsent" class="cookie-consent-overlay">
-    <div class="cookie-consent-modal">
-      <div class="cookie-consent-header">
-        <span class="cookie-icon">🍪</span>
-        <h2>Cookie Notice</h2>
-      </div>
-      <div class="cookie-consent-content">
-        <p>This website uses cookies and similar technologies to enhance your browsing experience, analyze site traffic, and personalize content.</p>
-        <p>By clicking "Accept All Cookies", you consent to the storage of cookies on your device. You can choose to decline non-essential cookies.</p>
+  <!-- Cookie Consent Banner (Non-blocking) -->
+  <div v-if="showCookieConsent" class="cookie-consent-banner">
+    <div class="cookie-consent-content">
+      <span class="cookie-icon">🍪</span>
+      <div class="cookie-consent-text">
+        <p><strong>Cookie Notice:</strong> This website uses cookies to enhance your browsing experience and analyze site traffic. By using this site, you consent to our use of cookies.</p>
       </div>
       <div class="cookie-consent-actions">
-        <button @click="acceptCookies" class="btn btn-accept">Accept All Cookies</button>
-        <button @click="declineCookies" class="btn btn-decline">Decline Non-Essential</button>
+        <button @click="acceptCookies" class="btn-banner btn-accept">Accept</button>
+        <button @click="declineCookies" class="btn-banner btn-decline">Decline</button>
       </div>
     </div>
   </div>

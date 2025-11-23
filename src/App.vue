@@ -10,7 +10,7 @@ declare global {
 }
 
 // Action definitions with sensible FilterPreset defaults and hints
-const ACTIONS: Omit<Action, 'binding'>[] = [
+const ACTIONS: Omit<Action, 'bindings'>[] = [
   { name: 'HelicopterCollectiveIncrease', filterPreset: 'up', hint: 'Increase altitude (raise collective)', hardware: 'throttle', importance: 'critical' },
   { name: 'HelicopterCollectiveDecrease', filterPreset: 'down', hint: 'Decrease altitude (lower collective)', hardware: 'throttle', importance: 'critical' },
   { name: 'HelicopterAntiTorqueLeft', filterPreset: 'left', hint: 'Yaw left (left pedal)', hardware: 'pedals', importance: 'critical' },
@@ -78,7 +78,7 @@ interface AxisCalibration {
 
 // State
 const state = reactive<AppState>({
-  actions: ACTIONS.map(action => ({ ...action, binding: null })),
+  actions: ACTIONS.map(action => ({ ...action, bindings: [] })),
   currentActionIndex: -1,
   furthestActionIndex: -1,
   configuring: false,
@@ -94,6 +94,7 @@ const axisCalibration = reactive<AxisCalibration>({})
 
 const hatModeEnabled = ref(false)
 const calibrationModeEnabled = ref(false)
+const autoProgressEnabled = ref(true) // Auto-advance to next action after confirming binding
 
 // Cookie consent state
 const showCookieConsent = ref(false)
@@ -114,13 +115,13 @@ const gitHash = __GIT_HASH__
 // Computed
 const filteredActions = computed(() => {
   return state.actions.filter(action => {
-    if (state.filter === 'configured') return action.binding
-    if (state.filter === 'unconfigured') return !action.binding
+    if (state.filter === 'configured') return action.bindings.length > 0
+    if (state.filter === 'unconfigured') return action.bindings.length === 0
     return true
   })
 })
 
-const configuredCount = computed(() => state.actions.filter(a => a.binding).length)
+const configuredCount = computed(() => state.actions.filter(a => a.bindings.length > 0).length)
 const unconfiguredCount = computed(() => state.actions.length - configuredCount.value)
 const progressPercentage = computed(() => (configuredCount.value / state.actions.length) * 100)
 
@@ -134,7 +135,7 @@ const currentAction = computed(() => {
 const showResumeButton = computed(() => {
   if (state.currentActionIndex < state.furthestActionIndex) {
     let resumeIndex = state.furthestActionIndex
-    while (resumeIndex < state.actions.length && state.actions[resumeIndex].binding) {
+    while (resumeIndex < state.actions.length && state.actions[resumeIndex].bindings.length > 0) {
       resumeIndex++
     }
     return resumeIndex < state.actions.length
@@ -144,7 +145,7 @@ const showResumeButton = computed(() => {
 
 const resumeActionNumber = computed(() => {
   let resumeIndex = state.furthestActionIndex
-  while (resumeIndex < state.actions.length && state.actions[resumeIndex].binding) {
+  while (resumeIndex < state.actions.length && state.actions[resumeIndex].bindings.length > 0) {
     resumeIndex++
   }
   return resumeIndex + 1
@@ -164,7 +165,7 @@ const isCurrentActionFireAction = computed(() => {
 
 const configuredFireActions = computed(() => {
   return state.actions.filter(action =>
-    FIRE_ACTION_NAMES.includes(action.name) && action.binding !== null
+    FIRE_ACTION_NAMES.includes(action.name) && action.bindings.length > 0
   )
 })
 
@@ -290,7 +291,7 @@ function skipCurrentAction() {
 
 function clearCurrentActionBinding() {
   if (currentAction.value) {
-    currentAction.value.binding = null
+    currentAction.value.bindings = []
     state.pendingInput = null
     state.inputCooldown = false
     resetGamepadBaseline()
@@ -299,7 +300,7 @@ function clearCurrentActionBinding() {
 
 function copyFireActionBinding() {
   if (currentAction.value && firstConfiguredFireAction.value) {
-    currentAction.value.binding = firstConfiguredFireAction.value.binding
+    currentAction.value.bindings = [...firstConfiguredFireAction.value.bindings]
     state.pendingInput = null
     state.inputCooldown = true
     setTimeout(() => {
@@ -314,7 +315,7 @@ function nextAction() {
   state.pendingInput = null
 
   let nextIndex = state.currentActionIndex + 1
-  while (nextIndex < state.actions.length && state.actions[nextIndex].binding) {
+  while (nextIndex < state.actions.length && state.actions[nextIndex].bindings.length > 0) {
     nextIndex++
   }
 
@@ -360,7 +361,7 @@ function jumpToAction(index: number) {
 
 function resumeConfiguration() {
   let nextIndex = state.furthestActionIndex
-  while (nextIndex < state.actions.length && state.actions[nextIndex].binding) {
+  while (nextIndex < state.actions.length && state.actions[nextIndex].bindings.length > 0) {
     nextIndex++
   }
   if (nextIndex < state.actions.length) {
@@ -375,14 +376,26 @@ function finishConfiguration() {
 
 function confirmInput() {
   if (state.pendingInput && currentAction.value) {
-    currentAction.value.binding = state.pendingInput
+    // Add the new binding to the array if it doesn't already exist
+    if (!currentAction.value.bindings.includes(state.pendingInput)) {
+      currentAction.value.bindings.push(state.pendingInput)
+    }
     state.pendingInput = null
     state.inputCooldown = true
     setTimeout(() => {
       state.inputCooldown = false
       resetGamepadBaseline()
-      nextAction()
+      // Auto-advance to next action if enabled
+      if (autoProgressEnabled.value) {
+        nextAction()
+      }
     }, 300)
+  }
+}
+
+function removeBinding(index: number) {
+  if (currentAction.value && index >= 0 && index < currentAction.value.bindings.length) {
+    currentAction.value.bindings.splice(index, 1)
   }
 }
 
@@ -576,7 +589,7 @@ function generateGUID(): string {
 function trackConfigDownload() {
   const joysticks = Object.values(state.connectedGamepads)
   const joystickTypes = joysticks.map(j => j.id).join(', ') || 'None'
-  const configuredActionsCount = state.actions.filter(a => a.binding).length
+  const configuredActionsCount = state.actions.filter(a => a.bindings.length > 0).length
 
   if (window.gtag) {
     window.gtag('event', 'download_config', {
@@ -594,39 +607,44 @@ function generateConfig(): string {
   let config = 'ActionManager {\n Actions {\n'
 
   state.actions.forEach(action => {
-    if (action.binding) {
+    if (action.bindings.length > 0) {
       const inputSourceGUID = generateGUID()
-      const inputValueGUID = generateGUID()
 
       config += `  Action ${action.name} {\n`
       config += `   InputSource InputSourceSum "${inputSourceGUID}" {\n`
       config += `    Sources {\n`
-      config += `     InputSourceValue "${inputValueGUID}" {\n`
-      config += `      FilterPreset "${action.filterPreset}"\n`
-      config += `      Input "${action.binding}"\n`
 
-      if (action.filterPreset === 'toggle') {
-        const filterGUID = generateGUID()
-        config += `      Filter InputFilterDown "${filterGUID}" {\n`
-        config += `      }\n`
-      } else if (action.filterPreset === 'hold' && (action.name.includes('Engine') || action.name.includes('ADS'))) {
-        const filterGUID = generateGUID()
-        config += `      Filter InputFilterHold "${filterGUID}" {\n`
-        if (action.name.includes('ADSHold')) {
-          config += `       HoldDuration -1\n`
+      // Generate an InputSourceValue for each binding
+      action.bindings.forEach(binding => {
+        const inputValueGUID = generateGUID()
+        config += `     InputSourceValue "${inputValueGUID}" {\n`
+        config += `      FilterPreset "${action.filterPreset}"\n`
+        config += `      Input "${binding}"\n`
+
+        if (action.filterPreset === 'toggle') {
+          const filterGUID = generateGUID()
+          config += `      Filter InputFilterDown "${filterGUID}" {\n`
+          config += `      }\n`
+        } else if (action.filterPreset === 'hold' && (action.name.includes('Engine') || action.name.includes('ADS'))) {
+          const filterGUID = generateGUID()
+          config += `      Filter InputFilterHold "${filterGUID}" {\n`
+          if (action.name.includes('ADSHold')) {
+            config += `       HoldDuration -1\n`
+          }
+          config += `      }\n`
+        } else if (action.name.includes('Reset')) {
+          const filterGUID = generateGUID()
+          config += `      Filter InputFilterSingleClick "${filterGUID}" {\n`
+          config += `      }\n`
+        } else if (action.name.includes('EngineStop')) {
+          const filterGUID = generateGUID()
+          config += `      Filter InputFilterHoldOnce "${filterGUID}" {\n`
+          config += `      }\n`
         }
-        config += `      }\n`
-      } else if (action.name.includes('Reset')) {
-        const filterGUID = generateGUID()
-        config += `      Filter InputFilterSingleClick "${filterGUID}" {\n`
-        config += `      }\n`
-      } else if (action.name.includes('EngineStop')) {
-        const filterGUID = generateGUID()
-        config += `      Filter InputFilterHoldOnce "${filterGUID}" {\n`
-        config += `      }\n`
-      }
 
-      config += `     }\n`
+        config += `     }\n`
+      })
+
       config += `    }\n`
       config += `   }\n`
       config += `  }\n`
@@ -718,18 +736,29 @@ function handleLoadConfig(event: Event) {
 }
 
 function parseConfig(configText: string) {
-  const actionRegex = /Action\s+(\w+)\s*{[\s\S]*?Input\s+"([^"]+)"/g
-  let match
+  // Clear all existing bindings
+  state.actions.forEach(action => action.bindings = [])
 
-  state.actions.forEach(action => action.binding = null)
+  // Match each Action block
+  const actionBlockRegex = /Action\s+(\w+)\s*\{([\s\S]*?)\n  \}/g
+  let actionMatch
 
-  while ((match = actionRegex.exec(configText)) !== null) {
-    const actionName = match[1]
-    const input = match[2]
+  while ((actionMatch = actionBlockRegex.exec(configText)) !== null) {
+    const actionName = actionMatch[1]
+    const actionContent = actionMatch[2]
 
     const action = state.actions.find(a => a.name === actionName)
     if (action) {
-      action.binding = input
+      // Find all Input entries within this action
+      const inputRegex = /Input\s+"([^"]+)"/g
+      let inputMatch
+
+      while ((inputMatch = inputRegex.exec(actionContent)) !== null) {
+        const input = inputMatch[1]
+        if (!action.bindings.includes(input)) {
+          action.bindings.push(input)
+        }
+      }
     }
   }
 }
@@ -1015,25 +1044,41 @@ onUnmounted(() => {
               <strong>Important: Fire Button Binding</strong>
               <p>All fire actions (CharacterFire, TurretFire, HelicopterFire, VehicleFire) should be bound to the SAME trigger button. This ensures consistent firing across all vehicle types and on-foot combat.</p>
               <div v-if="firstConfiguredFireAction && firstConfiguredFireAction.name !== currentAction?.name" class="fire-action-suggestion">
-                <p>✓ You already configured <strong>{{ formatActionName(firstConfiguredFireAction.name) }}</strong> to <strong>{{ firstConfiguredFireAction.binding }}</strong></p>
+                <p>✓ You already configured <strong>{{ formatActionName(firstConfiguredFireAction.name) }}</strong> to <strong>{{ firstConfiguredFireAction.bindings.join(', ') }}</strong></p>
                 <button @click="copyFireActionBinding" class="btn btn-primary btn-small">
-                  Use Same Binding ({{ firstConfiguredFireAction.binding }})
+                  Use Same Bindings ({{ firstConfiguredFireAction.bindings.join(', ') }})
                 </button>
               </div>
             </div>
           </div>
 
           <div class="input-detection-container">
-            <div class="input-detected" :class="{ 'has-input': state.pendingInput || currentAction?.binding }">
-              <div v-if="!state.pendingInput && !currentAction?.binding" class="waiting-message">Waiting for input...</div>
-              <strong v-else>{{ state.pendingInput || currentAction?.binding }}</strong>
+            <div class="input-detected" :class="{ 'has-input': state.pendingInput || (currentAction?.bindings && currentAction.bindings.length > 0) }">
+              <div v-if="!state.pendingInput && (!currentAction?.bindings || currentAction.bindings.length === 0)" class="waiting-message">Waiting for input...</div>
+              <div v-else-if="state.pendingInput">
+                <strong>{{ state.pendingInput }}</strong>
+              </div>
+              <div v-else-if="currentAction?.bindings && currentAction.bindings.length > 0">
+                <div v-for="(binding, index) in currentAction.bindings" :key="index" class="binding-item">
+                  <strong>{{ binding }}</strong>
+                  <button @click="removeBinding(index)" class="btn-remove-binding" title="Remove this binding">×</button>
+                </div>
+              </div>
             </div>
             <div v-if="state.pendingInput" class="confirmation-prompt">
               <div class="confirm-icon">✓</div>
-              <div class="confirm-text">Press <kbd>SPACE</kbd> to confirm</div>
+              <div class="confirm-text">Press <kbd>SPACE</kbd> to confirm and add binding</div>
+            </div>
+            <div v-else-if="currentAction?.bindings && currentAction.bindings.length > 0" class="add-more-prompt">
+              <div class="add-more-text" v-if="autoProgressEnabled">Action configured! Disable auto-progress below to add multiple bindings, or press <kbd>↓</kbd> to continue</div>
+              <div class="add-more-text" v-else>Press any button or move any axis to add another binding, or press <kbd>↓</kbd> to continue</div>
             </div>
           </div>
           <div class="hat-mode-control">
+            <label class="hat-mode-label">
+              <input type="checkbox" v-model="autoProgressEnabled">
+              <span>Auto-progress to next action (simpler workflow for single bindings)</span>
+            </label>
             <label class="hat-mode-label">
               <input type="checkbox" v-model="hatModeEnabled">
               <span>HAT Mode (simplified axis detection)</span>
@@ -1123,12 +1168,12 @@ onUnmounted(() => {
                class="action-item"
                :class="{
                  current: state.actions.indexOf(action) === state.currentActionIndex,
-                 configured: action.binding,
+                 configured: action.bindings.length > 0,
                  clickable: state.configuring
                }"
                @click="state.configuring && jumpToAction(state.actions.indexOf(action))">
             <span class="action-item-name">{{ formatActionName(action.name) }}</span>
-            <span class="action-item-binding">{{ action.binding || '-' }}</span>
+            <span class="action-item-binding">{{ action.bindings.length > 0 ? action.bindings.join(', ') : '-' }}</span>
             <span class="action-item-status"></span>
           </div>
         </div>

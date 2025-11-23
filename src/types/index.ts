@@ -30,7 +30,7 @@ export interface Action {
   hint: string;
   hardware: HardwareType;
   importance: ImportanceLevel;
-  binding: string | null;
+  bindings: string[];
 }
 
 export interface ConnectedGamepad {

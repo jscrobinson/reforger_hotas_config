@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
+import { ref, reactive, computed, onMounted, onUnmounted, watch } from 'vue'
 import type { Action, AppState, GamepadState } from './types'
 
 // Google Analytics gtag declaration
@@ -59,8 +59,21 @@ const ACTIONS: Omit<Action, 'bindings'>[] = [
   { name: 'PerformAction', filterPreset: 'pressed', hint: 'Context action (interact, reload, etc.)', hardware: 'button', importance: 'important' },
   { name: 'SelectAction', filterPreset: 'previous', hint: 'Cycle through available actions', hardware: 'button', importance: 'optional' },
   { name: 'GetOut', filterPreset: 'click', hint: 'Exit vehicle safely', hardware: 'button', importance: 'important' },
-  { name: 'JumpOut', filterPreset: 'click', hint: 'Emergency eject (dangerous!)', hardware: 'button', importance: 'optional' },
-  { name: 'WCS_Armament_DeployFlares', filterPreset: 'hold', hint: 'Deploy Flares (WCS Armaments)', hardware: 'button', importance: 'optional' }
+  { name: 'JumpOut', filterPreset: 'click', hint: 'Emergency eject (dangerous!)', hardware: 'button', importance: 'optional' }
+]
+
+// WCS Armament actions (optional mod support)
+const WCS_ACTIONS: Omit<Action, 'bindings'>[] = [
+  { name: 'WCS_Armament_DeployFlares', filterPreset: 'hold', hint: 'Deploy flares (countermeasure)', hardware: 'button', importance: 'optional' },
+  { name: 'WCS_Armament_DeployChaffs', filterPreset: 'hold', hint: 'Deploy chaff (countermeasure)', hardware: 'button', importance: 'optional' },
+  { name: 'WCS_Armament_TurretStabilizationToggle', filterPreset: 'click', hint: 'Toggle turret stabilization', hardware: 'button', importance: 'optional' },
+  { name: 'WCS_Armament_VehicleAim', filterPreset: 'hold', hint: 'Vehicle aim mode', hardware: 'button', importance: 'optional' },
+  { name: 'WCS_Armament_CycleWeaponFireMode', filterPreset: 'click', hint: 'Cycle weapon fire mode', hardware: 'button', importance: 'optional' },
+  { name: 'WCS_Armament_ActivateLock', filterPreset: 'hold', hint: 'Activate weapon lock', hardware: 'button', importance: 'optional' },
+  { name: 'WCS_Armament_DeploySmoke', filterPreset: 'hold', hint: 'Deploy smoke (countermeasure)', hardware: 'button', importance: 'optional' },
+  { name: 'WCS_Armament_RadarToggle', filterPreset: 'click', hint: 'Toggle radar', hardware: 'button', importance: 'optional' },
+  { name: 'WCS_Armament_FireContinuousSmokeDispenser', filterPreset: 'hold', hint: 'Fire continuous smoke dispenser', hardware: 'button', importance: 'optional' },
+  { name: 'TurretWeaponNextRippleQuantity', filterPreset: 'click', hint: 'Cycle weapon ripple quantity', hardware: 'button', importance: 'optional' }
 ]
 
 // Axis calibration data
@@ -95,6 +108,34 @@ const axisCalibration = reactive<AxisCalibration>({})
 const hatModeEnabled = ref(false)
 const calibrationModeEnabled = ref(false)
 const autoProgressEnabled = ref(true) // Auto-advance to next action after confirming binding
+const wcsActionsEnabled = ref(false) // Include WCS Armament mod actions
+
+// Watch for WCS actions toggle and rebuild actions list
+watch(wcsActionsEnabled, (enabled) => {
+  const baseActions = ACTIONS.map(action => ({ ...action, bindings: [] as string[] }))
+  const wcsActions = WCS_ACTIONS.map(action => ({ ...action, bindings: [] as string[] }))
+
+  // Preserve existing bindings where possible
+  const existingBindings = new Map(state.actions.map(a => [a.name, a.bindings]))
+
+  const newActions = enabled ? [...baseActions, ...wcsActions] : baseActions
+  newActions.forEach(action => {
+    const existing = existingBindings.get(action.name)
+    if (existing) {
+      action.bindings = existing
+    }
+  })
+
+  state.actions = newActions
+
+  // Reset current action index if it's out of bounds
+  if (state.currentActionIndex >= state.actions.length) {
+    state.currentActionIndex = state.actions.length - 1
+  }
+  if (state.furthestActionIndex >= state.actions.length) {
+    state.furthestActionIndex = state.actions.length - 1
+  }
+})
 
 // Cookie consent state
 const showCookieConsent = ref(false)
@@ -175,7 +216,9 @@ const firstConfiguredFireAction = computed(() => {
 
 // Methods
 function formatActionName(name: string): string {
-  return name.replace(/_/g, "").replace(/([A-Z]([^A-Z]))/g, ' $1').trim()
+  // Strip WCS_Armament_ prefix for cleaner display
+  const cleanName = name.replace(/^WCS_Armament_/, '')
+  return cleanName.replace(/_/g, "").replace(/([A-Z]([^A-Z]))/g, ' $1').trim()
 }
 
 // Utility function to describe input in human-readable form (currently unused but kept for future use)
@@ -863,6 +906,10 @@ onUnmounted(() => {
             <span class="icon">⚙️</span>
             <span>Contribute on GitHub</span>
           </a>
+          <a href="https://www.paypal.com/donate/?hosted_button_id=Z37V73UUKF3LY" target="_blank" rel="noopener noreferrer" class="community-link donate-link">
+            <span class="icon">☕</span>
+            <span>If you found this tool useful and would like to support my work, a coffee would be greatly appreciated.</span>
+          </a>
           <div class="server-info">
             <span class="icon">🎮</span>
             <span>Find our servers: Search <strong>Delta Farce</strong> in the Reforger server browser</span>
@@ -1007,6 +1054,11 @@ onUnmounted(() => {
         <button @click="downloadConfig" :disabled="configuredCount === 0" class="btn btn-success" :class="{ 'btn-pulse': isConfigurationComplete }">
           {{ isConfigurationComplete ? '✓ Download Your Config File' : 'Download Config' }}
         </button>
+      </div>
+      <div class="donate-hint">
+        <a href="https://www.paypal.com/donate/?hosted_button_id=Z37V73UUKF3LY" target="_blank" rel="noopener noreferrer">
+          ☕ If you found this tool useful and would like to support my work, a coffee would be greatly appreciated.
+        </a>
       </div>
       <div class="save-location-hint">
         <p><strong>Save Location:</strong> %USERPROFILE%\Documents\My Games\ArmaReforger\profile\.save\settings\customInputConfigs</p>
@@ -1162,6 +1214,12 @@ onUnmounted(() => {
           <button class="filter-btn" :class="{ active: state.filter === 'unconfigured' }" @click="state.filter = 'unconfigured'">
             Unconfigured (<span>{{ unconfiguredCount }}</span>)
           </button>
+        </div>
+        <div class="wcs-toggle">
+          <label class="wcs-toggle-label">
+            <input type="checkbox" v-model="wcsActionsEnabled">
+            <span>Include WCS Armament actions (mod)</span>
+          </label>
         </div>
         <div class="actions-list">
           <div v-for="action in filteredActions" :key="action.name"

@@ -1248,6 +1248,7 @@ onUnmounted(() => {
         <span class="version-separator">•</span>
         <span class="version-info">Version: <code>{{ gitHash }}</code></span>
       </p>
+      <p class="credits">Designed by StormPale</p>
     </footer>
   </div>
 </template>

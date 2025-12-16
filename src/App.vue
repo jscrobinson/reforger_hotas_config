@@ -1190,6 +1190,12 @@ onUnmounted(() => {
         <p><strong>Too sensitive or not sensitive enough:</strong> Axis sensitivity and dead zones can be adjusted within Arma Reforger's control settings. Start with your hardware configured here, then fine-tune sensitivity curves in-game for optimal feel.</p>
         <p><strong>Multiple controllers interfering:</strong> If you have multiple game controllers connected (like an Xbox controller for ground combat and a HOTAS for flying), make sure you're binding the correct device. The joystick index number shown in the configurator helps identify which physical device is being configured.</p>
       </div>
+
+      <h3>WCS Mod Support (Experimental)</h3>
+      <div class="about-content">
+        <p>This tool includes optional support for the <strong>WCS Armament mod</strong> which adds advanced weapon systems to helicopters and vehicles. Enable "Include WCS Armament actions" in the action list to configure these bindings.</p>
+        <p><strong>Note:</strong> Some WCS action names (like <em>WCS_Armament_CycleWeapon</em> for pilot weapon switching) are speculative and may not match the actual mod implementation. If you find that certain WCS bindings don't work, or if you know the correct action names, please let us know on our <a href="https://discord.gg/armawcs" target="_blank" rel="noopener noreferrer">Discord</a> or <a href="https://github.com/jscrobinson/reforger_hotas_config/issues" target="_blank" rel="noopener noreferrer">GitHub</a> so we can update the tool.</p>
+      </div>
     </div>
 
     <!-- Configurator Tool Section -->

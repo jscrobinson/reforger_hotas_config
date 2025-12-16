@@ -27,12 +27,12 @@ const ACTIONS: Omit<Action, 'bindings'>[] = [
   { name: 'HelicopterEngineStart', filterPreset: 'hold', hint: 'Start engine and rotors', hardware: 'button', importance: 'critical' },
   { name: 'HelicopterEngineStop', filterPreset: 'click', hint: 'Stop engine and rotors', hardware: 'button', importance: 'critical' },
   { name: 'CharacterFire', filterPreset: 'hold', hint: 'Fire primary weapon (use same trigger as all fire actions)', hardware: 'trigger', importance: 'critical' },
-  { name: 'CharacterNextWeapon', filterPreset: 'click', hint: 'Switch to next weapon', hardware: 'hat', importance: 'important' },
+  { name: 'CharacterNextWeapon', filterPreset: 'click', hint: 'Switch to next weapon (use same button as all weapon switch actions)', hardware: 'hat', importance: 'important' },
   { name: 'CharacterNextFireMode', filterPreset: 'click', hint: 'Change fire mode (single/burst/auto)', hardware: 'button', importance: 'important' },
   { name: 'CharacterNextMuzzle', filterPreset: 'click', hint: 'Switch muzzle attachment or barrel', hardware: 'button', importance: 'optional' },
   { name: 'TurretFire', filterPreset: 'hold', hint: 'Fire turret weapon (use same trigger as all fire actions)', hardware: 'trigger', importance: 'important' },
   { name: 'TurretReload', filterPreset: 'click', hint: 'Reload turret weapon', hardware: 'button', importance: 'important' },
-  { name: 'TurretNextWeapon', filterPreset: 'click', hint: 'Cycle turret weapons', hardware: 'hat', importance: 'important' },
+  { name: 'TurretNextWeapon', filterPreset: 'click', hint: 'Cycle turret weapons (use same button as all weapon switch actions)', hardware: 'hat', importance: 'important' },
   { name: 'TurretNextFireMode', filterPreset: 'click', hint: 'Change turret fire mode', hardware: 'button', importance: 'optional' },
   { name: 'TurretADS', filterPreset: 'click', hint: 'Aim down sights (toggle)', hardware: 'button', importance: 'optional' },
   { name: 'TurretADSHold', filterPreset: 'hold', hint: 'Aim down sights (hold)', hardware: 'button', importance: 'optional' },
@@ -109,6 +109,11 @@ const hatModeEnabled = ref(false)
 const calibrationModeEnabled = ref(false)
 const autoProgressEnabled = ref(true) // Auto-advance to next action after confirming binding
 const wcsActionsEnabled = ref(false) // Include WCS Armament mod actions
+
+// Test mode state
+const testModeEnabled = ref(false)
+const testModeInput = ref<string | null>(null)
+const testModeMatchingActions = ref<Action[]>([])
 
 // Watch for WCS actions toggle and rebuild actions list
 watch(wcsActionsEnabled, (enabled) => {
@@ -199,6 +204,9 @@ const isConfigurationComplete = computed(() => {
 // Fire action helpers
 const FIRE_ACTION_NAMES = ['CharacterFire', 'TurretFire', 'HelicopterFire', 'VehicleFire']
 
+// Weapon switching action helpers
+const WEAPON_SWITCH_ACTION_NAMES = ['CharacterNextWeapon', 'TurretNextWeapon']
+
 const isCurrentActionFireAction = computed(() => {
   if (!currentAction.value) return false
   return FIRE_ACTION_NAMES.includes(currentAction.value.name)
@@ -212,6 +220,22 @@ const configuredFireActions = computed(() => {
 
 const firstConfiguredFireAction = computed(() => {
   return configuredFireActions.value.length > 0 ? configuredFireActions.value[0] : null
+})
+
+// Weapon switching computed properties
+const isCurrentActionWeaponSwitch = computed(() => {
+  if (!currentAction.value) return false
+  return WEAPON_SWITCH_ACTION_NAMES.includes(currentAction.value.name)
+})
+
+const configuredWeaponSwitchActions = computed(() => {
+  return state.actions.filter(action =>
+    WEAPON_SWITCH_ACTION_NAMES.includes(action.name) && action.bindings.length > 0
+  )
+})
+
+const firstConfiguredWeaponSwitchAction = computed(() => {
+  return configuredWeaponSwitchActions.value.length > 0 ? configuredWeaponSwitchActions.value[0] : null
 })
 
 // Methods
@@ -354,6 +378,19 @@ function copyFireActionBinding() {
   }
 }
 
+function copyWeaponSwitchBinding() {
+  if (currentAction.value && firstConfiguredWeaponSwitchAction.value) {
+    currentAction.value.bindings = [...firstConfiguredWeaponSwitchAction.value.bindings]
+    state.pendingInput = null
+    state.inputCooldown = true
+    setTimeout(() => {
+      state.inputCooldown = false
+      resetGamepadBaseline()
+      nextAction()
+    }, 300)
+  }
+}
+
 function nextAction() {
   state.pendingInput = null
 
@@ -415,6 +452,140 @@ function resumeConfiguration() {
 function finishConfiguration() {
   state.configuring = false
   state.currentActionIndex = -1
+}
+
+// Test mode functions
+function findActionsByInput(input: string): Action[] {
+  return state.actions.filter(action => action.bindings.includes(input))
+}
+
+function startTestMode() {
+  testModeEnabled.value = true
+  testModeInput.value = null
+  testModeMatchingActions.value = []
+  state.inputCooldown = false
+  resetGamepadBaseline()
+}
+
+function exitTestMode() {
+  testModeEnabled.value = false
+  testModeInput.value = null
+  testModeMatchingActions.value = []
+}
+
+function handleTestModeInput(input: string) {
+  testModeInput.value = input
+  testModeMatchingActions.value = findActionsByInput(input)
+}
+
+function detectTestModeInput(gamepad: Gamepad, gamepadIndex: number) {
+  if (state.inputCooldown) return
+
+  if (!state.previousGamepadState[gamepadIndex]) {
+    state.previousGamepadState[gamepadIndex] = {
+      buttons: gamepad.buttons.map(b => ({ pressed: b.pressed })),
+      axes: [...gamepad.axes]
+    }
+    return
+  }
+
+  const prevState = state.previousGamepadState[gamepadIndex]
+
+  // Check buttons
+  for (let i = 0; i < gamepad.buttons.length; i++) {
+    const button = gamepad.buttons[i]
+    const prevButton = prevState.buttons[i] || { pressed: false }
+    if (button.pressed && !prevButton.pressed) {
+      handleTestModeInput(`joystick${gamepadIndex}:button${i}`)
+      state.inputCooldown = true
+      setTimeout(() => {
+        state.inputCooldown = false
+      }, 200)
+      return
+    }
+  }
+
+  // Check axes
+  const AXIS_THRESHOLD = 0.75
+  const HAT_THRESHOLD = 0.5
+  const FRAME_DELTA_THRESHOLD = 0.3
+  const TOTAL_MOVEMENT_THRESHOLD = 0.5
+
+  const baselineState = state.baselineGamepadState[gamepadIndex]
+
+  for (let i = 0; i < gamepad.axes.length; i++) {
+    const rawAxisValue = gamepad.axes[i]
+    const axisValue = normalizeAxisValue(gamepadIndex, i, rawAxisValue)
+
+    const prevRawAxisValue = prevState.axes[i] !== undefined ? prevState.axes[i] : rawAxisValue
+    const prevAxisValue = normalizeAxisValue(gamepadIndex, i, prevRawAxisValue)
+
+    const baselineRawAxisValue = baselineState?.axes[i] !== undefined ? baselineState.axes[i] : rawAxisValue
+    const baselineAxisValue = normalizeAxisValue(gamepadIndex, i, baselineRawAxisValue)
+
+    const frameDelta = Math.abs(axisValue - prevAxisValue)
+    const totalMovement = Math.abs(axisValue - baselineAxisValue)
+
+    // HAT MODE
+    if (hatModeEnabled.value) {
+      if (frameDelta > 0.25) {
+        if (Math.abs(axisValue) > 0.3) {
+          const direction = axisValue > 0 ? '+' : '-'
+          handleTestModeInput(`joystick${gamepadIndex}:axis${i}${direction}`)
+          state.inputCooldown = true
+          setTimeout(() => {
+            state.inputCooldown = false
+          }, 200)
+          return
+        }
+      }
+    }
+
+    // Hat switch detection
+    const isNearDiscrete = Math.abs(Math.abs(axisValue) - 1.0) < 0.15 || Math.abs(axisValue) < 0.15
+    const nowAtExtreme = Math.abs(axisValue) > HAT_THRESHOLD
+
+    if (frameDelta > FRAME_DELTA_THRESHOLD && isNearDiscrete && nowAtExtreme) {
+      let direction: string | undefined
+      if (axisValue < -HAT_THRESHOLD) {
+        direction = '-'
+      } else if (axisValue > HAT_THRESHOLD) {
+        direction = '+'
+      }
+      if (direction) {
+        handleTestModeInput(`joystick${gamepadIndex}:axis${i}${direction}`)
+        state.inputCooldown = true
+        setTimeout(() => {
+          state.inputCooldown = false
+        }, 200)
+        return
+      }
+    }
+
+    // Regular analog axis detection
+    if (totalMovement > TOTAL_MOVEMENT_THRESHOLD && !isNearDiscrete) {
+      if (axisValue > AXIS_THRESHOLD) {
+        handleTestModeInput(`joystick${gamepadIndex}:axis${i}+`)
+        state.inputCooldown = true
+        setTimeout(() => {
+          state.inputCooldown = false
+        }, 200)
+        return
+      } else if (axisValue < -AXIS_THRESHOLD) {
+        handleTestModeInput(`joystick${gamepadIndex}:axis${i}-`)
+        state.inputCooldown = true
+        setTimeout(() => {
+          state.inputCooldown = false
+        }, 200)
+        return
+      }
+    }
+  }
+
+  state.previousGamepadState[gamepadIndex] = {
+    buttons: gamepad.buttons.map(b => ({ pressed: b.pressed })),
+    axes: [...gamepad.axes]
+  }
 }
 
 function confirmInput() {
@@ -587,6 +758,11 @@ function pollGamepads() {
 
       if (state.configuring && state.currentActionIndex >= 0) {
         detectInput(gamepad, i)
+      }
+
+      // Test mode input detection
+      if (testModeEnabled.value) {
+        detectTestModeInput(gamepad, i)
       }
     }
   }
@@ -1054,6 +1230,9 @@ onUnmounted(() => {
         <button @click="downloadConfig" :disabled="configuredCount === 0" class="btn btn-success" :class="{ 'btn-pulse': isConfigurationComplete }">
           {{ isConfigurationComplete ? '✓ Download Your Config File' : 'Download Config' }}
         </button>
+        <button @click="startTestMode" :disabled="configuredCount === 0" class="btn btn-test">
+          Test Bindings
+        </button>
       </div>
       <div class="donate-hint">
         <a href="https://www.paypal.com/donate/?hosted_button_id=Z37V73UUKF3LY" target="_blank" rel="noopener noreferrer">
@@ -1066,12 +1245,93 @@ onUnmounted(() => {
     </div>
 
     <!-- Configuration Complete Banner -->
-    <div v-if="isConfigurationComplete" class="completion-banner">
+    <div v-if="isConfigurationComplete && !testModeEnabled" class="completion-banner">
       <div class="completion-content">
         <div class="completion-icon">🎉</div>
         <div class="completion-message">
           <h3>Configuration Complete!</h3>
           <p>All {{ state.actions.length }} actions have been configured. Click "Download Your Config File" above to save your configuration.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Test Mode Section -->
+    <div v-if="testModeEnabled" class="test-mode-section">
+      <div class="test-mode-header">
+        <div class="test-mode-icon">🎮</div>
+        <div class="test-mode-title">
+          <h2>Test Your Bindings</h2>
+          <p>Press any button or move any axis on your joystick to see which actions are bound to it.</p>
+        </div>
+        <button @click="exitTestMode" class="btn btn-secondary">Exit Test Mode</button>
+      </div>
+
+      <div class="test-mode-content">
+        <div class="test-mode-input-display">
+          <div class="test-input-label">Detected Input:</div>
+          <div class="test-input-value" :class="{ 'has-input': testModeInput }">
+            {{ testModeInput || 'Waiting for input...' }}
+          </div>
+        </div>
+
+        <div class="test-mode-results">
+          <div class="test-results-label">Bound Actions:</div>
+          <div v-if="!testModeInput" class="test-results-placeholder">
+            Press a button or move an axis to see bound actions
+          </div>
+          <div v-else-if="testModeMatchingActions.length === 0" class="test-results-empty">
+            No actions are bound to this input
+          </div>
+          <div v-else class="test-results-list">
+            <div v-for="action in testModeMatchingActions" :key="action.name" class="test-result-item">
+              <span class="test-result-name">{{ formatActionName(action.name) }}</span>
+              <span class="test-result-hint">{{ action.hint }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="test-mode-options">
+        <label class="hat-mode-label">
+          <input type="checkbox" v-model="hatModeEnabled">
+          <span>HAT Mode (simplified axis detection)</span>
+        </label>
+      </div>
+
+      <!-- Live Input Visualization -->
+      <div class="test-mode-visualization">
+        <div class="test-viz-header">
+          <h3>Live Input Monitor</h3>
+        </div>
+        <div v-if="gamepadVisualizations.length === 0" class="test-viz-no-devices">
+          <p>No joysticks detected. Connect a joystick and press any button.</p>
+        </div>
+        <div v-for="gamepadViz in gamepadVisualizations" :key="gamepadViz.index" class="test-viz-gamepad">
+          <div class="test-viz-gamepad-header">
+            <span class="test-viz-device-number">Device {{ gamepadViz.index }}</span>
+            <span class="test-viz-device-name">{{ gamepadViz.name }}</span>
+          </div>
+          <div class="test-viz-content">
+            <div class="test-viz-axes">
+              <div v-for="(value, axisIndex) in gamepadViz.axes" :key="`test-device-${gamepadViz.index}-axis-${axisIndex}`" class="test-viz-axis">
+                <span class="test-viz-axis-label">Axis {{ axisIndex }}</span>
+                <div class="test-viz-axis-bar-container">
+                  <div class="test-viz-axis-center-line"></div>
+                  <div class="test-viz-axis-bar" :class="{ active: Math.abs(value) > 0.1 }" :style="{
+                    left: value < 0 ? `${((value + 1) / 2) * 100}%` : '50%',
+                    width: value < 0 ? `${(50 - ((value + 1) / 2) * 100)}%` : `${(((value + 1) / 2) - 0.5) * 100}%`
+                  }"></div>
+                </div>
+                <span class="test-viz-axis-value">{{ value.toFixed(2) }}</span>
+              </div>
+            </div>
+            <div class="test-viz-buttons">
+              <div v-for="(pressed, btnIndex) in gamepadViz.buttons" :key="`test-device-${gamepadViz.index}-button-${btnIndex}`"
+                   class="test-viz-button" :class="{ active: pressed }">
+                <span class="test-viz-button-number">{{ btnIndex }}</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -1099,6 +1359,21 @@ onUnmounted(() => {
                 <p>✓ You already configured <strong>{{ formatActionName(firstConfiguredFireAction.name) }}</strong> to <strong>{{ firstConfiguredFireAction.bindings.join(', ') }}</strong></p>
                 <button @click="copyFireActionBinding" class="btn btn-primary btn-small">
                   Use Same Bindings ({{ firstConfiguredFireAction.bindings.join(', ') }})
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Weapon Switch Action Notice -->
+          <div v-if="isCurrentActionWeaponSwitch" class="fire-action-notice">
+            <div class="fire-action-icon">🔄</div>
+            <div class="fire-action-content">
+              <strong>Important: Weapon Switch Binding</strong>
+              <p>All weapon switch actions (CharacterNextWeapon, TurretNextWeapon) should be bound to the SAME button. This ensures consistent weapon cycling across all contexts.</p>
+              <div v-if="firstConfiguredWeaponSwitchAction && firstConfiguredWeaponSwitchAction.name !== currentAction?.name" class="fire-action-suggestion">
+                <p>✓ You already configured <strong>{{ formatActionName(firstConfiguredWeaponSwitchAction.name) }}</strong> to <strong>{{ firstConfiguredWeaponSwitchAction.bindings.join(', ') }}</strong></p>
+                <button @click="copyWeaponSwitchBinding" class="btn btn-primary btn-small">
+                  Use Same Bindings ({{ firstConfiguredWeaponSwitchAction.bindings.join(', ') }})
                 </button>
               </div>
             </div>

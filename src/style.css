@@ -844,6 +844,17 @@ header h1 {
     box-shadow: 1px 1px 0 0 rgba(0,0,0,0.4);
 }
 
+.btn-test {
+    background: linear-gradient(180deg, #42A5F5 0%, #2196F3 100%);
+    color: #fff;
+}
+
+.btn-test:hover:not(:disabled) {
+    background: linear-gradient(180deg, #64B5F6 0%, #42A5F5 100%);
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0 0 rgba(0,0,0,0.4);
+}
+
 .btn-pulse {
     animation: pulse-button 2s ease-in-out infinite;
     font-size: 1.1em;
@@ -2071,4 +2082,386 @@ header h1 {
         height: 28px;
         font-size: 0.7em;
     }
+}
+
+/* Test Mode Styles */
+.test-mode-section {
+    background: linear-gradient(135deg, rgba(67, 76, 94, 0.95) 0%, rgba(45, 52, 54, 0.95) 100%);
+    border-radius: 0;
+    padding: 25px;
+    margin: 20px 0;
+    box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.5);
+    border: 3px solid #2196F3;
+    border-left: 8px solid #2196F3;
+    position: relative;
+}
+
+.test-mode-section::before {
+    content: 'TEST MODE';
+    position: absolute;
+    top: -14px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #2d3436;
+    padding: 3px 20px;
+    font-size: 0.75em;
+    color: #2196F3;
+    font-weight: bold;
+    letter-spacing: 3px;
+    border: 2px solid #2196F3;
+}
+
+.test-mode-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 25px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid rgba(33, 150, 243, 0.3);
+}
+
+.test-mode-icon {
+    font-size: 3em;
+    flex-shrink: 0;
+}
+
+.test-mode-title {
+    flex: 1;
+}
+
+.test-mode-title h2 {
+    margin: 0 0 8px 0;
+    font-size: 1.5em;
+    color: #2196F3;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: 900;
+}
+
+.test-mode-title p {
+    margin: 0;
+    color: #bdc3c7;
+    font-size: 1em;
+    line-height: 1.5;
+}
+
+.test-mode-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 25px;
+    margin-bottom: 20px;
+}
+
+@media (max-width: 768px) {
+    .test-mode-content {
+        grid-template-columns: 1fr;
+    }
+
+    .test-mode-header {
+        flex-direction: column;
+        text-align: center;
+    }
+}
+
+.test-mode-input-display {
+    background: rgba(33, 150, 243, 0.1);
+    border: 2px solid #2196F3;
+    border-radius: 0;
+    padding: 20px;
+}
+
+.test-input-label {
+    font-size: 0.9em;
+    color: #2196F3;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+}
+
+.test-input-value {
+    font-size: 1.8em;
+    font-weight: 900;
+    font-family: 'Courier New', monospace;
+    color: #7f8c8d;
+    padding: 15px;
+    background: rgba(0, 0, 0, 0.2);
+    border: 2px dashed #4a5d23;
+    border-radius: 0;
+    text-align: center;
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.test-input-value.has-input {
+    color: #2196F3;
+    border-color: #2196F3;
+    border-style: solid;
+    background: rgba(33, 150, 243, 0.15);
+    animation: inputPulse 0.5s ease;
+}
+
+@keyframes inputPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+    100% { transform: scale(1); }
+}
+
+.test-mode-results {
+    background: rgba(74, 93, 35, 0.2);
+    border: 2px solid #4a5d23;
+    border-radius: 0;
+    padding: 20px;
+}
+
+.test-results-label {
+    font-size: 0.9em;
+    color: #d4af37;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+}
+
+.test-results-placeholder,
+.test-results-empty {
+    padding: 20px;
+    text-align: center;
+    color: #7f8c8d;
+    font-style: italic;
+    font-size: 0.95em;
+}
+
+.test-results-empty {
+    color: #e74c3c;
+    background: rgba(231, 76, 60, 0.1);
+    border: 1px dashed #e74c3c;
+    border-radius: 0;
+}
+
+.test-results-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.test-result-item {
+    padding: 12px 15px;
+    background: rgba(76, 175, 80, 0.15);
+    border: 2px solid #4CAF50;
+    border-left: 6px solid #4CAF50;
+    border-radius: 0;
+    transition: all 0.2s ease;
+}
+
+.test-result-item:hover {
+    background: rgba(76, 175, 80, 0.25);
+}
+
+.test-result-name {
+    display: block;
+    font-weight: 900;
+    color: #4CAF50;
+    font-size: 1.1em;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 5px;
+}
+
+.test-result-hint {
+    display: block;
+    font-size: 0.9em;
+    color: #bdc3c7;
+    line-height: 1.4;
+}
+
+.test-mode-options {
+    display: flex;
+    justify-content: center;
+    padding-top: 15px;
+    border-top: 2px solid rgba(33, 150, 243, 0.3);
+}
+
+.credits {
+    margin-top: 10px !important;
+    font-size: 0.85em !important;
+    color: #7f8c8d !important;
+}
+
+/* Test Mode Visualization */
+.test-mode-visualization {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 2px solid rgba(33, 150, 243, 0.3);
+}
+
+.test-viz-header {
+    margin-bottom: 15px;
+}
+
+.test-viz-header h3 {
+    margin: 0;
+    font-size: 1.1em;
+    color: #2196F3;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 700;
+}
+
+.test-viz-no-devices {
+    padding: 20px;
+    text-align: center;
+    color: #7f8c8d;
+    font-style: italic;
+    background: rgba(0, 0, 0, 0.1);
+    border: 1px dashed #4a5d23;
+}
+
+.test-viz-gamepad {
+    background: rgba(33, 150, 243, 0.1);
+    border: 2px solid rgba(33, 150, 243, 0.3);
+    padding: 15px;
+    margin-bottom: 15px;
+}
+
+.test-viz-gamepad:last-child {
+    margin-bottom: 0;
+}
+
+.test-viz-gamepad-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(33, 150, 243, 0.3);
+}
+
+.test-viz-device-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #2196F3;
+    color: white;
+    font-weight: 900;
+    font-size: 0.8em;
+    padding: 4px 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.test-viz-device-name {
+    font-size: 0.85em;
+    color: #bdc3c7;
+    font-style: italic;
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.test-viz-content {
+    display: grid;
+    gap: 15px;
+}
+
+.test-viz-axes {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.test-viz-axis {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.test-viz-axis-label {
+    min-width: 60px;
+    font-size: 0.85em;
+    font-weight: 600;
+    color: #bdc3c7;
+}
+
+.test-viz-axis-bar-container {
+    flex: 1;
+    height: 20px;
+    background: rgba(0, 0, 0, 0.2);
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(33, 150, 243, 0.3);
+}
+
+.test-viz-axis-center-line {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: rgba(33, 150, 243, 0.5);
+    z-index: 1;
+}
+
+.test-viz-axis-bar {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, #4CAF50, #66BB6A);
+    transition: all 0.05s ease-out;
+}
+
+.test-viz-axis-bar.active {
+    background: linear-gradient(90deg, #2196F3, #64B5F6);
+    box-shadow: 0 0 10px rgba(33, 150, 243, 0.6);
+}
+
+.test-viz-axis-value {
+    min-width: 50px;
+    text-align: right;
+    font-family: 'Courier New', monospace;
+    font-size: 0.85em;
+    color: #bdc3c7;
+    font-weight: 600;
+}
+
+.test-viz-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(33, 150, 243, 0.2);
+}
+
+.test-viz-button {
+    min-width: 36px;
+    height: 28px;
+    border-radius: 4px;
+    background: rgba(0, 0, 0, 0.2);
+    border: 2px solid rgba(33, 150, 243, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 8px;
+    font-size: 0.8em;
+    font-weight: 700;
+    color: #7f8c8d;
+    transition: all 0.1s ease;
+}
+
+.test-viz-button.active {
+    background: #2196F3;
+    border-color: #1976D2;
+    color: #fff;
+    box-shadow: 0 0 15px rgba(33, 150, 243, 0.8);
+    transform: scale(1.1);
+}
+
+.test-viz-button-number {
+    font-weight: 700;
 }

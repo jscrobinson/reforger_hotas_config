@@ -1086,10 +1086,6 @@ onUnmounted(() => {
             <span class="icon">⚙️</span>
             <span>Contribute on GitHub</span>
           </a>
-          <a href="https://www.paypal.com/donate/?hosted_button_id=Z37V73UUKF3LY" target="_blank" rel="noopener noreferrer" class="community-link donate-link">
-            <span class="icon">☕</span>
-            <span>If you found this tool useful and would like to support my work, a coffee would be greatly appreciated.</span>
-          </a>
           <div class="server-info">
             <span class="icon">🎮</span>
             <span>Find our servers: Search <strong>Delta Farce</strong> in the Reforger server browser</span>
@@ -1251,10 +1247,18 @@ onUnmounted(() => {
           Test Bindings
         </button>
       </div>
-      <div class="donate-hint">
-        <a href="https://www.paypal.com/donate/?hosted_button_id=Z37V73UUKF3LY" target="_blank" rel="noopener noreferrer">
-          ☕ If you found this tool useful and would like to support my work, a coffee would be greatly appreciated.
-        </a>
+      <div class="donate-box">
+        <div class="donate-content">
+          <span class="donate-icon">☕</span>
+          <span class="donate-text">
+            <strong>Support This Tool</strong>
+            <span>If you found this useful, a coffee would be greatly appreciated!</span>
+          </span>
+        </div>
+        <form action="https://www.paypal.com/donate" method="post" target="_top" class="donate-form">
+          <input type="hidden" name="hosted_button_id" value="KGDA8PQN7847L" />
+          <button type="submit" class="btn-donate">Donate with PayPal</button>
+        </form>
       </div>
       <div class="save-location-hint">
         <p><strong>Save Location:</strong> %USERPROFILE%\Documents\My Games\ArmaReforger\profile\.save\settings\customInputConfigs</p>

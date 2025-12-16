@@ -781,21 +781,69 @@ header h1 {
     justify-content: center;
 }
 
-.donate-hint {
-    margin-top: 15px;
+.donate-box {
+    margin-top: 20px;
     text-align: center;
+    padding: 20px 25px;
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.15) 0%, rgba(212, 175, 55, 0.05) 100%);
+    border: 2px solid #d4af37;
+    box-shadow: 3px 3px 0 0 rgba(0,0,0,0.3);
 }
 
-.donate-hint a {
+.donate-content {
+    display: inline-flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.donate-icon {
+    font-size: 2.5em;
+}
+
+.donate-text {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    gap: 3px;
+}
+
+.donate-text strong {
+    font-size: 1.2em;
+    letter-spacing: 1px;
+    text-transform: uppercase;
     color: #d4af37;
-    text-decoration: none;
-    font-size: 0.95em;
-    transition: color 0.2s ease;
 }
 
-.donate-hint a:hover {
-    color: #f0d060;
-    text-decoration: underline;
+.donate-text span {
+    font-size: 0.9em;
+    color: #bdc3c7;
+}
+
+.donate-form {
+    display: inline-block;
+}
+
+.btn-donate {
+    padding: 12px 30px;
+    background: linear-gradient(180deg, #0070ba 0%, #003087 100%);
+    color: #fff;
+    border: 2px solid #003087;
+    border-radius: 0;
+    font-size: 1em;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: 'Courier New', monospace;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 3px 3px 0 0 rgba(0,0,0,0.3);
+}
+
+.btn-donate:hover {
+    background: linear-gradient(180deg, #003087 0%, #001f5c 100%);
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0 0 rgba(0,0,0,0.3);
 }
 
 .save-location-hint {

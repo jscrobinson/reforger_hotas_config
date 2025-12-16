@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thank You! | HOTAS Configurator for Arma Reforger</title>
+    <meta name="robots" content="noindex, nofollow">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-H8S8RY73V8"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-H8S8RY73V8');
+      // Track donation conversion
+      gtag('event', 'donation_complete', {
+        'event_category': 'engagement',
+        'event_label': 'PayPal Donation'
+      });
+    </script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: #1e2229 url('/bg-texture.png') repeat;
+            color: #dfe6e9;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .thank-you-container {
+            max-width: 600px;
+            text-align: center;
+            background: linear-gradient(135deg, rgba(67, 76, 94, 0.95) 0%, rgba(45, 52, 54, 0.95) 100%);
+            padding: 50px 40px;
+            border: 3px solid #d4af37;
+            box-shadow: 8px 8px 0 0 rgba(0,0,0,0.4);
+        }
+
+        .thank-you-icon {
+            font-size: 5em;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            color: #d4af37;
+            font-size: 2.5em;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 20px;
+            font-weight: 900;
+        }
+
+        .message {
+            font-size: 1.2em;
+            line-height: 1.8;
+            color: #bdc3c7;
+            margin-bottom: 30px;
+        }
+
+        .message strong {
+            color: #d4af37;
+        }
+
+        .badge {
+            margin: 30px 0;
+        }
+
+        .badge img {
+            max-width: 150px;
+            height: auto;
+        }
+
+        .back-link {
+            display: inline-block;
+            padding: 15px 40px;
+            background: linear-gradient(180deg, #5d6d3b 0%, #4a5d23 100%);
+            color: #d4af37;
+            text-decoration: none;
+            font-size: 1.1em;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border: 2px solid #d4af37;
+            transition: all 0.2s ease;
+            box-shadow: 4px 4px 0 0 rgba(0,0,0,0.4);
+        }
+
+        .back-link:hover {
+            background: linear-gradient(180deg, #6d7d4b 0%, #5a6d33 100%);
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0 0 rgba(0,0,0,0.4);
+        }
+
+        .community-links {
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 2px solid #4a5d23;
+        }
+
+        .community-links p {
+            color: #7f8c8d;
+            margin-bottom: 15px;
+        }
+
+        .community-links a {
+            color: #d4af37;
+            text-decoration: none;
+            margin: 0 10px;
+            transition: color 0.2s ease;
+        }
+
+        .community-links a:hover {
+            color: #f0d060;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="thank-you-container">
+        <div class="thank-you-icon">&#9825;</div>
+        <h1>Thank You!</h1>
+        <p class="message">
+            Your support means the world to us! Your donation helps keep this tool free and actively maintained for the <strong>Arma Reforger</strong> community.
+        </p>
+        <p class="message">
+            We hope the HOTAS Configurator makes your helicopter flying experience smoother. Happy flying, pilot!
+        </p>
+
+        <div class="badge">
+            <img src="/delta-farce-badge.png" alt="Delta Farce Gaming Community">
+        </div>
+
+        <a href="/" class="back-link">Back to Configurator</a>
+
+        <div class="community-links">
+            <p>Join our community:</p>
+            <a href="https://discord.deltafarce.win" target="_blank" rel="noopener noreferrer">Discord</a>
+            <a href="https://github.com/jscrobinson/reforger_hotas_config" target="_blank" rel="noopener noreferrer">GitHub</a>
+        </div>
+    </div>
+</body>
+</html>

@@ -1194,6 +1194,7 @@ onUnmounted(() => {
           <p><strong>Axis inverted or wrong direction:</strong> Reforger allows you to invert axes in-game. If your control feels backward after configuration, check the game's control settings for invert options rather than reconfiguring here.</p>
           <p><strong>Too sensitive or not sensitive enough:</strong> Axis sensitivity and dead zones can be adjusted within Arma Reforger's control settings. Start with your hardware configured here, then fine-tune sensitivity curves in-game for optimal feel.</p>
           <p><strong>Multiple controllers interfering:</strong> If you have multiple game controllers connected (like an Xbox controller for ground combat and a HOTAS for flying), make sure you're binding the correct device. The joystick index number shown in the configurator helps identify which physical device is being configured.</p>
+          <p><strong>Axes configured but not working in-game:</strong> If your axes are correctly configured in this tool but don't respond properly in Arma Reforger, try calibrating your device in Windows. Search for "Set up USB game controllers" in the Start menu, select your device, click "Properties", then go to the "Settings" tab and click "Calibrate". Follow the wizard to recalibrate your axes. This ensures Windows is reporting the correct axis ranges to the game.</p>
         </div>
 
         <h3>WCS Mod Support (Experimental)</h3>

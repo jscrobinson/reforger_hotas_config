@@ -64,6 +64,7 @@ const ACTIONS: Omit<Action, 'bindings'>[] = [
 
 // WCS Armament actions (optional mod support)
 const WCS_ACTIONS: Omit<Action, 'bindings'>[] = [
+  { name: 'WCS_Armament_CycleWeapon', filterPreset: 'click', hint: 'Cycle to next weapon (pilot/vehicle weapons)', hardware: 'button', importance: 'important' },
   { name: 'WCS_Armament_DeployFlares', filterPreset: 'hold', hint: 'Deploy flares (countermeasure)', hardware: 'button', importance: 'optional' },
   { name: 'WCS_Armament_DeployChaffs', filterPreset: 'hold', hint: 'Deploy chaff (countermeasure)', hardware: 'button', importance: 'optional' },
   { name: 'WCS_Armament_TurretStabilizationToggle', filterPreset: 'click', hint: 'Toggle turret stabilization', hardware: 'button', importance: 'optional' },

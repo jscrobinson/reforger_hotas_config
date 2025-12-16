@@ -116,6 +116,9 @@ const testModeEnabled = ref(false)
 const testModeInput = ref<string | null>(null)
 const testModeMatchingActions = ref<Action[]>([])
 
+// Documentation expanded state
+const docsExpanded = ref(false)
+
 // Watch for WCS actions toggle and rebuild actions list
 watch(wcsActionsEnabled, (enabled) => {
   const baseActions = ACTIONS.map(action => ({ ...action, bindings: [] as string[] }))
@@ -1097,104 +1100,111 @@ onUnmounted(() => {
 
     <!-- About Section -->
     <div class="about-section">
-      <h2>Why Use This Tool?</h2>
-      <div class="about-content">
-        <p>Arma Reforger only has built-in support for two specific joystick models. For all other HOTAS (Hands On Throttle And Stick) setups and joysticks, you need to manually create and edit configuration files - a tedious and error-prone process.</p>
-        <p><strong>This tool simplifies everything:</strong> It detects your connected joysticks, walks you through binding each flight control action, and generates a ready-to-use configuration file that you can drop directly into your game folder.</p>
-      </div>
+      <button @click="docsExpanded = !docsExpanded" class="docs-toggle-btn">
+        <span class="docs-toggle-icon">{{ docsExpanded ? '▼' : '▶' }}</span>
+        <span class="docs-toggle-text">{{ docsExpanded ? 'Hide Documentation' : 'Show Documentation & Help' }}</span>
+      </button>
 
-      <h3>How to Use</h3>
-      <div class="instructions">
-        <ol class="instruction-list">
-          <li>
-            <strong>Connect Your Joystick/HOTAS</strong>
-            <p>Plug in your controller and press any button. It should appear in the "Connected Joysticks" section above.</p>
-          </li>
-          <li>
-            <strong>Choose Your Starting Point</strong>
-            <p>You have three options:</p>
-            <ul>
-              <li><strong>Load a Vanilla Config Template:</strong> Start with an official Arma Reforger config for Logitech Extreme 3D Pro or Saitek X56 HOTAS and customize it</li>
-              <li><strong>Load Your Own Config:</strong> Upload an existing config file you've created or downloaded</li>
-              <li><strong>Start From Scratch:</strong> Create a completely new configuration by binding each action yourself</li>
-            </ul>
-          </li>
-          <li>
-            <strong>Configure Actions</strong>
-            <p>If starting from scratch or modifying bindings, click "Start Configuring" and follow the prompts. For each action, press the button or move the axis you want to assign, then press SPACE to confirm.</p>
-          </li>
-          <li>
-            <strong>Use HAT Mode for Tricky Controls</strong>
-            <p>If HAT switches or certain axes aren't detecting properly, enable "HAT Mode" for simplified detection.</p>
-          </li>
-          <li>
-            <strong>Download Your Config</strong>
-            <p>When finished, click "Download Config" to save your configuration file.</p>
-          </li>
-          <li>
-            <strong>Install the Config</strong>
-            <p>Copy the downloaded .conf file to your game's customInputConfigs folder:</p>
-            <code>%USERPROFILE%\Documents\My Games\ArmaReforger\profile\.save\settings\customInputConfigs</code>
-            <p>If the folder doesn't exist, create it. The file needs to be in the .save directory for Reforger to detect it.</p>
-          </li>
-          <li>
-            <strong>Activate in Reforger</strong>
-            <p>Launch Reforger and go to <strong>Options → Controls</strong>. At the top of the controls menu, you'll see a dropdown to select your custom input config. Choose your newly created config file.</p>
-            <p><strong>Pro tip:</strong> You can keep Reforger running while you update your config file! Just modify and save the file, then reselect it from the dropdown in the Controls menu to reload your changes. This makes it easy to tweak bindings without restarting the game.</p>
-          </li>
-        </ol>
-      </div>
+      <div v-show="docsExpanded" class="docs-content">
+        <h2>Why Use This Tool?</h2>
+        <div class="about-content">
+          <p>Arma Reforger only has built-in support for two specific joystick models. For all other HOTAS (Hands On Throttle And Stick) setups and joysticks, you need to manually create and edit configuration files - a tedious and error-prone process.</p>
+          <p><strong>This tool simplifies everything:</strong> It detects your connected joysticks, walks you through binding each flight control action, and generates a ready-to-use configuration file that you can drop directly into your game folder.</p>
+        </div>
 
-      <div class="tips-box">
-        <h4>💡 Pro Tips</h4>
-        <ul>
-          <li>Start with a vanilla config template if you have a similar joystick - it's much faster than configuring from scratch</li>
-          <li>You can skip actions you don't need by clicking "Skip"</li>
-          <li>Use the action list on the right to jump to specific actions</li>
-          <li>Load an existing config file and modify only the bindings you want to change</li>
-          <li>Test your bindings in-game and come back to adjust if needed</li>
-        </ul>
-      </div>
+        <h3>How to Use</h3>
+        <div class="instructions">
+          <ol class="instruction-list">
+            <li>
+              <strong>Connect Your Joystick/HOTAS</strong>
+              <p>Plug in your controller and press any button. It should appear in the "Connected Joysticks" section above.</p>
+            </li>
+            <li>
+              <strong>Choose Your Starting Point</strong>
+              <p>You have three options:</p>
+              <ul>
+                <li><strong>Load a Vanilla Config Template:</strong> Start with an official Arma Reforger config for Logitech Extreme 3D Pro or Saitek X56 HOTAS and customize it</li>
+                <li><strong>Load Your Own Config:</strong> Upload an existing config file you've created or downloaded</li>
+                <li><strong>Start From Scratch:</strong> Create a completely new configuration by binding each action yourself</li>
+              </ul>
+            </li>
+            <li>
+              <strong>Configure Actions</strong>
+              <p>If starting from scratch or modifying bindings, click "Start Configuring" and follow the prompts. For each action, press the button or move the axis you want to assign, then press SPACE to confirm.</p>
+            </li>
+            <li>
+              <strong>Use HAT Mode for Tricky Controls</strong>
+              <p>If HAT switches or certain axes aren't detecting properly, enable "HAT Mode" for simplified detection.</p>
+            </li>
+            <li>
+              <strong>Download Your Config</strong>
+              <p>When finished, click "Download Config" to save your configuration file.</p>
+            </li>
+            <li>
+              <strong>Install the Config</strong>
+              <p>Copy the downloaded .conf file to your game's customInputConfigs folder:</p>
+              <code>%USERPROFILE%\Documents\My Games\ArmaReforger\profile\.save\settings\customInputConfigs</code>
+              <p>If the folder doesn't exist, create it. The file needs to be in the .save directory for Reforger to detect it.</p>
+            </li>
+            <li>
+              <strong>Activate in Reforger</strong>
+              <p>Launch Reforger and go to <strong>Options → Controls</strong>. At the top of the controls menu, you'll see a dropdown to select your custom input config. Choose your newly created config file.</p>
+              <p><strong>Pro tip:</strong> You can keep Reforger running while you update your config file! Just modify and save the file, then reselect it from the dropdown in the Controls menu to reload your changes. This makes it easy to tweak bindings without restarting the game.</p>
+            </li>
+          </ol>
+        </div>
 
-      <h3>Supported HOTAS & Flight Stick Hardware</h3>
-      <div class="about-content">
-        <p>This configurator works with virtually any joystick, throttle, or HOTAS system that connects via USB, including:</p>
-        <ul>
-          <li><strong>Thrustmaster:</strong> T.16000M, HOTAS Warthog, T.Flight HOTAS X, T.Flight HOTAS One, HOTAS Cougar</li>
-          <li><strong>Logitech:</strong> Extreme 3D Pro, G X56 HOTAS, G Saitek X52, X52 Pro, G Saitek X55</li>
-          <li><strong>VKB:</strong> Gladiator NXT, Gunfighter series, T-Rudders pedals</li>
-          <li><strong>Virpil:</strong> VPC Constellation ALPHA, WarBRD, MongoosT-50, VPC Throttle</li>
-          <li><strong>CH Products:</strong> Fighterstick, Pro Throttle, Pro Pedals</li>
-          <li><strong>Microsoft:</strong> Sidewinder series</li>
-          <li><strong>Generic USB joysticks and game controllers</strong> with analog axes and buttons</li>
-        </ul>
-        <p>If your controller shows up in Windows Game Controllers and has programmable buttons or axes, it will work with this tool. The configurator uses the browser's Gamepad API to detect inputs, so no drivers or additional software are required.</p>
-      </div>
+        <div class="tips-box">
+          <h4>Pro Tips</h4>
+          <ul>
+            <li>Start with a vanilla config template if you have a similar joystick - it's much faster than configuring from scratch</li>
+            <li>You can skip actions you don't need by clicking "Skip"</li>
+            <li>Use the action list on the right to jump to specific actions</li>
+            <li>Load an existing config file and modify only the bindings you want to change</li>
+            <li>Test your bindings in-game and come back to adjust if needed</li>
+          </ul>
+        </div>
 
-      <h3>Understanding Arma Reforger Flight Controls</h3>
-      <div class="about-content">
-        <p>Arma Reforger's helicopter flight model requires precise control over multiple axes simultaneously. Here's what each control system does:</p>
-        <p><strong>Cyclic (Roll & Pitch):</strong> Your main flight stick controls the helicopter's cyclic. Moving the stick forward/back pitches the nose down/up, while left/right movement rolls the aircraft. This is typically your primary joystick.</p>
-        <p><strong>Collective (Altitude):</strong> Usually bound to a throttle or slider, the collective controls your vertical lift. Increasing collective adds power to the rotors and makes you climb; decreasing it causes descent. Smooth collective control is essential for hovering.</p>
-        <p><strong>Anti-Torque Pedals (Yaw):</strong> These counter the torque from the main rotor and control your heading. Most pilots use rudder pedals, but you can also bind yaw to a twist axis on your stick or to buttons for digital input.</p>
-        <p><strong>Weapon Systems:</strong> If you're flying armed helicopters, you'll want dedicated buttons for weapons control, target cycling, and firing. Co-pilot/gunner positions have additional turret controls.</p>
-        <p>The key to successful HOTAS setup in Reforger is ensuring smooth analog input for your primary flight controls (cyclic and collective) while having easily accessible buttons for secondary functions like landing gear, lights, and weapons.</p>
-      </div>
+        <h3>Supported HOTAS & Flight Stick Hardware</h3>
+        <div class="about-content">
+          <p>This configurator works with virtually any joystick, throttle, or HOTAS system that connects via USB, including:</p>
+          <ul>
+            <li><strong>Thrustmaster:</strong> T.16000M, HOTAS Warthog, T.Flight HOTAS X, T.Flight HOTAS One, HOTAS Cougar</li>
+            <li><strong>Logitech:</strong> Extreme 3D Pro, G X56 HOTAS, G Saitek X52, X52 Pro, G Saitek X55</li>
+            <li><strong>VKB:</strong> Gladiator NXT, Gunfighter series, T-Rudders pedals</li>
+            <li><strong>Virpil:</strong> VPC Constellation ALPHA, WarBRD, MongoosT-50, VPC Throttle</li>
+            <li><strong>CH Products:</strong> Fighterstick, Pro Throttle, Pro Pedals</li>
+            <li><strong>Microsoft:</strong> Sidewinder series</li>
+            <li><strong>Generic USB joysticks and game controllers</strong> with analog axes and buttons</li>
+          </ul>
+          <p>If your controller shows up in Windows Game Controllers and has programmable buttons or axes, it will work with this tool. The configurator uses the browser's Gamepad API to detect inputs, so no drivers or additional software are required.</p>
+        </div>
 
-      <h3>Troubleshooting Common Issues</h3>
-      <div class="about-content">
-        <p><strong>Controller not detected:</strong> If your joystick isn't appearing, make sure it's properly connected and recognized by Windows. Open "Set up USB game controllers" in Windows settings to verify. Try unplugging and reconnecting the device, then refresh this page.</p>
-        <p><strong>Axes only registering positive values (Sidewinder X2, rudder issues):</strong> Some joysticks have axes that don't properly center at zero - for example, the Microsoft Sidewinder X2's rudder axis ranges from 0 to +11 instead of -5 to +5. If you're experiencing this issue, enable "Axis Calibration" mode during configuration. Move all your axes through their full range of motion, and the tool will automatically learn and adjust for offset center points. This is only needed for problematic joysticks - most modern controllers work fine without calibration.</p>
-        <p><strong>HAT switch not working:</strong> Some HAT switches are detected as axes rather than buttons. Enable "HAT Mode" in the configurator for better detection. HAT switches typically output discrete values (often -1, 0, or +1) rather than smooth analog ranges.</p>
-        <p><strong>Axis inverted or wrong direction:</strong> Reforger allows you to invert axes in-game. If your control feels backward after configuration, check the game's control settings for invert options rather than reconfiguring here.</p>
-        <p><strong>Too sensitive or not sensitive enough:</strong> Axis sensitivity and dead zones can be adjusted within Arma Reforger's control settings. Start with your hardware configured here, then fine-tune sensitivity curves in-game for optimal feel.</p>
-        <p><strong>Multiple controllers interfering:</strong> If you have multiple game controllers connected (like an Xbox controller for ground combat and a HOTAS for flying), make sure you're binding the correct device. The joystick index number shown in the configurator helps identify which physical device is being configured.</p>
-      </div>
+        <h3>Understanding Arma Reforger Flight Controls</h3>
+        <div class="about-content">
+          <p>Arma Reforger's helicopter flight model requires precise control over multiple axes simultaneously. Here's what each control system does:</p>
+          <p><strong>Cyclic (Roll & Pitch):</strong> Your main flight stick controls the helicopter's cyclic. Moving the stick forward/back pitches the nose down/up, while left/right movement rolls the aircraft. This is typically your primary joystick.</p>
+          <p><strong>Collective (Altitude):</strong> Usually bound to a throttle or slider, the collective controls your vertical lift. Increasing collective adds power to the rotors and makes you climb; decreasing it causes descent. Smooth collective control is essential for hovering.</p>
+          <p><strong>Anti-Torque Pedals (Yaw):</strong> These counter the torque from the main rotor and control your heading. Most pilots use rudder pedals, but you can also bind yaw to a twist axis on your stick or to buttons for digital input.</p>
+          <p><strong>Weapon Systems:</strong> If you're flying armed helicopters, you'll want dedicated buttons for weapons control, target cycling, and firing. Co-pilot/gunner positions have additional turret controls.</p>
+          <p>The key to successful HOTAS setup in Reforger is ensuring smooth analog input for your primary flight controls (cyclic and collective) while having easily accessible buttons for secondary functions like landing gear, lights, and weapons.</p>
+        </div>
 
-      <h3>WCS Mod Support (Experimental)</h3>
-      <div class="about-content">
-        <p>This tool includes optional support for the <strong>WCS Armament mod</strong> which adds advanced weapon systems to helicopters and vehicles. Enable "Include WCS Armament actions" in the action list to configure these bindings.</p>
-        <p><strong>Note:</strong> Some WCS action names (like <em>WCS_Armament_CycleWeapon</em> for pilot weapon switching) are speculative and may not match the actual mod implementation. If you find that certain WCS bindings don't work, or if you know the correct action names, please let us know on our <a href="https://discord.deltafarce.win" target="_blank" rel="noopener noreferrer">Discord</a> or <a href="https://github.com/jscrobinson/reforger_hotas_config/issues" target="_blank" rel="noopener noreferrer">GitHub</a> so we can update the tool.</p>
+        <h3>Troubleshooting Common Issues</h3>
+        <div class="about-content">
+          <p><strong>Controller not detected:</strong> If your joystick isn't appearing, make sure it's properly connected and recognized by Windows. Open "Set up USB game controllers" in Windows settings to verify. Try unplugging and reconnecting the device, then refresh this page.</p>
+          <p><strong>Axes only registering positive values (Sidewinder X2, rudder issues):</strong> Some joysticks have axes that don't properly center at zero - for example, the Microsoft Sidewinder X2's rudder axis ranges from 0 to +11 instead of -5 to +5. If you're experiencing this issue, enable "Axis Calibration" mode during configuration. Move all your axes through their full range of motion, and the tool will automatically learn and adjust for offset center points. This is only needed for problematic joysticks - most modern controllers work fine without calibration.</p>
+          <p><strong>HAT switch not working:</strong> Some HAT switches are detected as axes rather than buttons. Enable "HAT Mode" in the configurator for better detection. HAT switches typically output discrete values (often -1, 0, or +1) rather than smooth analog ranges.</p>
+          <p><strong>Axis inverted or wrong direction:</strong> Reforger allows you to invert axes in-game. If your control feels backward after configuration, check the game's control settings for invert options rather than reconfiguring here.</p>
+          <p><strong>Too sensitive or not sensitive enough:</strong> Axis sensitivity and dead zones can be adjusted within Arma Reforger's control settings. Start with your hardware configured here, then fine-tune sensitivity curves in-game for optimal feel.</p>
+          <p><strong>Multiple controllers interfering:</strong> If you have multiple game controllers connected (like an Xbox controller for ground combat and a HOTAS for flying), make sure you're binding the correct device. The joystick index number shown in the configurator helps identify which physical device is being configured.</p>
+        </div>
+
+        <h3>WCS Mod Support (Experimental)</h3>
+        <div class="about-content">
+          <p>This tool includes optional support for the <strong>WCS Armament mod</strong> which adds advanced weapon systems to helicopters and vehicles. Enable "Include WCS Armament actions" in the action list to configure these bindings.</p>
+          <p><strong>Note:</strong> Some WCS action names (like <em>WCS_Armament_CycleWeapon</em> for pilot weapon switching) are speculative and may not match the actual mod implementation. If you find that certain WCS bindings don't work, or if you know the correct action names, please let us know on our <a href="https://discord.deltafarce.win" target="_blank" rel="noopener noreferrer">Discord</a> or <a href="https://github.com/jscrobinson/reforger_hotas_config/issues" target="_blank" rel="noopener noreferrer">GitHub</a> so we can update the tool.</p>
+        </div>
       </div>
     </div>
 

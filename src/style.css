@@ -336,6 +336,46 @@ header h1 {
     border-left: 6px solid #d4af37;
 }
 
+/* Documentation Toggle Button */
+.docs-toggle-btn {
+    width: 100%;
+    padding: 18px 30px;
+    background: linear-gradient(180deg, #5d6d3b 0%, #4a5d23 100%);
+    color: #d4af37;
+    border: 3px solid #d4af37;
+    border-radius: 0;
+    font-size: 1.3em;
+    font-weight: 900;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-family: 'Courier New', monospace;
+    box-shadow: 4px 4px 0 0 rgba(0,0,0,0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+}
+
+.docs-toggle-btn:hover {
+    background: linear-gradient(180deg, #6d7d4b 0%, #5a6d33 100%);
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0 0 rgba(0,0,0,0.4);
+}
+
+.docs-toggle-icon {
+    font-size: 0.9em;
+}
+
+.docs-toggle-text {
+    flex: none;
+}
+
+.docs-content {
+    margin-top: 25px;
+}
+
 .about-section h2 {
     font-size: 1.8em;
     margin-bottom: 20px;

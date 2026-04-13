@@ -1085,8 +1085,7 @@ onUnmounted(() => {
     </div>
 
     <header>
-      <img src="/delta-farce-badge.png" alt="Delta Farce" class="header-badge" />
-      <h1>Delta Farce - Arma Reforger HOTAS Configurator</h1>
+<h1>Arma Reforger HOTAS Configurator</h1>
       <p class="subtitle">Configure your joystick inputs for Arma Reforger</p>
       <div class="header-cta">
         <a href="#configurator" class="btn-cta">Start Configuring Now →</a>

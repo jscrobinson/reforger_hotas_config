@@ -1063,6 +1063,27 @@ onUnmounted(() => {
   </div>
 
   <div class="container">
+
+    <!-- Hire Me Banner -->
+    <div class="hire-banner">
+      <div class="hire-banner-content">
+        <div class="hire-banner-icon">👋</div>
+        <div class="hire-banner-text">
+          <h2 class="hire-banner-title">Looking for a DevOps / SRE / SysOps Engineer?</h2>
+          <p class="hire-banner-body">
+            Hi — I'm <strong>Jim Robinson</strong>, the developer behind this tool. I've recently been made redundant and am actively looking for my next role in DevOps, SRE, or SysOps.
+            I have hands-on experience with <strong>AWS &amp; GCP</strong>, <strong>Kubernetes</strong>, <strong>Terraform</strong>, <strong>CDK</strong>, CI/CD pipelines, and infrastructure automation,
+            with development skills across <strong>Python</strong>, <strong>Node.js</strong>, and <strong>PHP</strong>.
+            If you're hiring or know someone who is, I'd love to hear from you.
+          </p>
+          <div class="hire-banner-links">
+            <a href="https://github.com/jscrobinson" target="_blank" rel="noopener noreferrer" class="hire-link hire-link-github">GitHub</a>
+            <a href="https://www.linkedin.com/in/jimrobinsonshrewsbury/" target="_blank" rel="noopener noreferrer" class="hire-link hire-link-linkedin">LinkedIn</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <header>
       <img src="/delta-farce-badge.png" alt="Delta Farce" class="header-badge" />
       <h1>Delta Farce - Arma Reforger HOTAS Configurator</h1>

@@ -2553,3 +2553,100 @@ header h1 {
 .test-viz-button-number {
     font-weight: 700;
 }
+
+/* Hire Me Banner */
+.hire-banner {
+    background: linear-gradient(135deg, rgba(30, 80, 160, 0.25) 0%, rgba(30, 80, 160, 0.1) 100%);
+    border: 2px solid #4a90d9;
+    box-shadow: 0 0 18px rgba(74, 144, 217, 0.35), 3px 3px 0 0 rgba(0,0,0,0.3);
+    padding: 24px 28px;
+    margin-bottom: 24px;
+}
+
+.hire-banner-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 18px;
+}
+
+.hire-banner-icon {
+    font-size: 2.4em;
+    flex-shrink: 0;
+    line-height: 1;
+}
+
+.hire-banner-text {
+    flex: 1;
+}
+
+.hire-banner-title {
+    color: #5ba8f5;
+    font-family: 'Courier New', monospace;
+    font-size: 1.3em;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.hire-banner-body {
+    color: #dfe6e9;
+    line-height: 1.65;
+    margin-bottom: 14px;
+    font-size: 0.97em;
+}
+
+.hire-banner-body strong {
+    color: #5ba8f5;
+}
+
+.hire-banner-links {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.hire-link {
+    display: inline-block;
+    padding: 7px 18px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.88em;
+    font-weight: 700;
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border: 2px solid;
+    transition: background 0.15s, color 0.15s, box-shadow 0.15s;
+}
+
+.hire-link-github {
+    color: #dfe6e9;
+    border-color: #dfe6e9;
+}
+
+.hire-link-github:hover {
+    background: #dfe6e9;
+    color: #1a1a2e;
+    box-shadow: 0 0 10px rgba(223, 230, 233, 0.4);
+}
+
+.hire-link-linkedin {
+    color: #5ba8f5;
+    border-color: #5ba8f5;
+}
+
+.hire-link-linkedin:hover {
+    background: #5ba8f5;
+    color: #1a1a2e;
+    box-shadow: 0 0 10px rgba(74, 144, 217, 0.5);
+}
+
+@media (max-width: 600px) {
+    .hire-banner-content {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .hire-banner-title {
+        font-size: 1.1em;
+    }
+}

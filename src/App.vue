@@ -1074,6 +1074,8 @@ onUnmounted(() => {
             Hi — I'm <strong>Jim Robinson</strong>, the developer behind this tool. I've recently been made redundant and am actively looking for my next role in DevOps, SRE, or SysOps.
             I have hands-on experience with <strong>AWS &amp; GCP</strong>, <strong>Kubernetes</strong>, <strong>Terraform</strong>, <strong>CDK</strong>, CI/CD pipelines, and infrastructure automation,
             with development skills across <strong>Python</strong>, <strong>Node.js</strong>, and <strong>PHP</strong>.
+            I've delivered infrastructure and platform engineering for <strong>national broadcasters</strong>, <strong>global digital agencies</strong>, and other high-profile organisations —
+            working at scale where reliability and security genuinely matter.
             If you're hiring or know someone who is, I'd love to hear from you.
           </p>
           <div class="hire-banner-links">

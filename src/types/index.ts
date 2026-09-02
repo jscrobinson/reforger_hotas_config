@@ -29,6 +29,7 @@ export interface ActionNote {
   icon: string;
   title: string;
   text: string;
+  sharedInput: boolean;
 }
 
 export interface Action {

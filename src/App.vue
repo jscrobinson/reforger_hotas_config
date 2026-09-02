@@ -225,37 +225,58 @@ const isConfigurationComplete = computed(() => {
   return configuredCount.value === state.actions.length && configuredCount.value > 0
 })
 
-// Guidance shown while one of the listed actions is being bound
+// Guidance shown while one of the listed actions is being bound. A note marked
+// sharedInput also offers to copy the binding already given to another action
+// it lists, because those actions work best on one input.
 const ACTION_NOTES: ActionNote[] = [
   {
     names: ['TurretNextWeapon'],
     icon: '⚠️',
     title: 'Outdated, best to skip this one',
-    text: 'Writes TurretNextWeapon with FilterPreset "click", but Reforger uses "hold" for that action. Bound with "click" it fires every frame the button is held, so weapons flick past instead of stepping one at a time. Skip this step, leave it empty and use Turret Next Weapon Hold instead. Never map both to the same button, they write the same action.'
+    text: 'Writes TurretNextWeapon with FilterPreset "click", but Reforger uses "hold" for that action. Bound with "click" it fires every frame the button is held, so weapons flick past instead of stepping one at a time. Skip this step, leave it empty and use Turret Next Weapon Hold instead. Never map both to the same button, they write the same action.',
+    sharedInput: false
   },
   {
     names: ['TurretNextWeaponHold'],
     icon: '✅',
     title: 'Use this instead of the previous step',
-    text: 'Writes the same action as the previous step, TurretNextWeapon, but with FilterPreset "hold" as Reforger expects. Choose this one and leave the previous step empty. Never map both to the same button.'
-  },
-  {
-    names: ['TurretNextWeaponHold', 'TurretWeaponNextFireMode'],
-    icon: '\u{1F4A1}',
-    title: 'Worth knowing',
-    text: 'Reforger binds these two on one button by default (V on a keyboard): a tap changes fire mode, holding cycles weapons. You can do the same, or keep them on separate buttons. Both work.'
+    text: 'Writes the same action as the previous step, TurretNextWeapon, but with FilterPreset "hold" as Reforger expects. Choose this one and leave the previous step empty. Never map both to the same button.',
+    sharedInput: false
   },
   {
     names: ['TurretNextFireMode'],
     icon: '⚠️',
     title: 'Outdated, best to skip this one',
-    text: 'TurretNextFireMode is not a name Arma Reforger knows any more, so a binding here does nothing in game. The row is kept so older configs still load. Skip this step, leave it empty and use Turret Weapon Next Fire Mode instead.'
+    text: 'TurretNextFireMode is not a name Arma Reforger knows any more, so a binding here does nothing in game. The row is kept so older configs still load. Skip this step, leave it empty and use Turret Weapon Next Fire Mode instead.',
+    sharedInput: false
   },
   {
     names: ['TurretWeaponNextFireMode'],
     icon: '✅',
     title: 'Use this instead of the previous step',
-    text: 'Current name for changing the turret fire mode. The previous step writes TurretNextFireMode, which the game no longer knows.'
+    text: 'Current name for changing the turret fire mode. The previous step writes TurretNextFireMode, which the game no longer knows.',
+    sharedInput: false
+  },
+  {
+    names: ['TurretNextWeaponHold', 'TurretWeaponNextFireMode'],
+    icon: '\u{1F4A1}',
+    title: 'Worth knowing',
+    text: 'Reforger binds these two on one button by default (V on a keyboard): a tap changes fire mode, holding cycles weapons. You can do the same, or keep them on separate buttons. Both work.',
+    sharedInput: false
+  },
+  {
+    names: ['CharacterFire', 'TurretFire', 'HelicopterFire', 'VehicleFire'],
+    icon: '\u{1F3AF}',
+    title: 'Important: Fire Button Binding',
+    text: 'All fire actions (CharacterFire, TurretFire, HelicopterFire, VehicleFire) should be bound to the SAME trigger button. This ensures consistent firing across all vehicle types and on-foot combat.',
+    sharedInput: true
+  },
+  {
+    names: ['CharacterNextWeapon', 'TurretNextWeaponHold'],
+    icon: '\u{1F504}',
+    title: 'Important: Weapon Switch Binding',
+    text: 'All weapon switch actions (CharacterNextWeapon, TurretNextWeapon) should be bound to the SAME button. This ensures consistent weapon cycling across all contexts.',
+    sharedInput: true
   }
 ]
 
@@ -265,41 +286,16 @@ const currentActionNotes = computed(() => {
   return ACTION_NOTES.filter(note => note.names.includes(action.name))
 })
 
-// Fire action helpers
-const FIRE_ACTION_NAMES = ['CharacterFire', 'TurretFire', 'HelicopterFire', 'VehicleFire']
-
-// Weapon switching action helpers
-const WEAPON_SWITCH_ACTION_NAMES = ['CharacterNextWeapon', 'TurretNextWeaponHold']
-
-const isCurrentActionFireAction = computed(() => {
-  if (!currentAction.value) return false
-  return FIRE_ACTION_NAMES.includes(currentAction.value.name)
-})
-
-const configuredFireActions = computed(() => {
-  return state.actions.filter(action =>
-    FIRE_ACTION_NAMES.includes(action.name) && action.bindings.length > 0
+// Another action from a sharedInput note that is already bound, if it is not
+// the action being configured right now
+const bindingSuggestion = computed(() => {
+  const action = currentAction.value
+  const note = currentActionNotes.value.find(candidate => candidate.sharedInput)
+  if (!action || !note) return null
+  const configured = state.actions.find(candidate =>
+    note.names.includes(candidate.name) && candidate.bindings.length > 0
   )
-})
-
-const firstConfiguredFireAction = computed(() => {
-  return configuredFireActions.value.length > 0 ? configuredFireActions.value[0] : null
-})
-
-// Weapon switching computed properties
-const isCurrentActionWeaponSwitch = computed(() => {
-  if (!currentAction.value) return false
-  return WEAPON_SWITCH_ACTION_NAMES.includes(currentAction.value.name)
-})
-
-const configuredWeaponSwitchActions = computed(() => {
-  return state.actions.filter(action =>
-    WEAPON_SWITCH_ACTION_NAMES.includes(action.name) && action.bindings.length > 0
-  )
-})
-
-const firstConfiguredWeaponSwitchAction = computed(() => {
-  return configuredWeaponSwitchActions.value.length > 0 ? configuredWeaponSwitchActions.value[0] : null
+  return configured && configured.name !== action.name ? configured : null
 })
 
 // Methods
@@ -429,30 +425,18 @@ function clearCurrentActionBinding() {
   }
 }
 
-function copyFireActionBinding() {
-  if (currentAction.value && firstConfiguredFireAction.value) {
-    currentAction.value.bindings = [...firstConfiguredFireAction.value.bindings]
-    state.pendingInput = null
-    state.inputCooldown = true
-    setTimeout(() => {
-      state.inputCooldown = false
-      resetGamepadBaseline()
-      nextAction()
-    }, 300)
-  }
-}
+function copySuggestedBinding() {
+  const source = bindingSuggestion.value
+  if (!currentAction.value || !source) return
 
-function copyWeaponSwitchBinding() {
-  if (currentAction.value && firstConfiguredWeaponSwitchAction.value) {
-    currentAction.value.bindings = [...firstConfiguredWeaponSwitchAction.value.bindings]
-    state.pendingInput = null
-    state.inputCooldown = true
-    setTimeout(() => {
-      state.inputCooldown = false
-      resetGamepadBaseline()
-      nextAction()
-    }, 300)
-  }
+  currentAction.value.bindings = [...source.bindings]
+  state.pendingInput = null
+  state.inputCooldown = true
+  setTimeout(() => {
+    state.inputCooldown = false
+    resetGamepadBaseline()
+    nextAction()
+  }, 300)
 }
 
 function nextAction() {
@@ -1485,34 +1469,10 @@ onUnmounted(() => {
             <div class="fire-action-content">
               <strong>{{ note.title }}</strong>
               <p>{{ note.text }}</p>
-            </div>
-          </div>
-
-          <!-- Fire Action Notice -->
-          <div v-if="isCurrentActionFireAction" class="fire-action-notice">
-            <div class="fire-action-icon">🎯</div>
-            <div class="fire-action-content">
-              <strong>Important: Fire Button Binding</strong>
-              <p>All fire actions (CharacterFire, TurretFire, HelicopterFire, VehicleFire) should be bound to the SAME trigger button. This ensures consistent firing across all vehicle types and on-foot combat.</p>
-              <div v-if="firstConfiguredFireAction && firstConfiguredFireAction.name !== currentAction?.name" class="fire-action-suggestion">
-                <p>✓ You already configured <strong>{{ formatActionName(firstConfiguredFireAction.name) }}</strong> to <strong>{{ firstConfiguredFireAction.bindings.join(', ') }}</strong></p>
-                <button @click="copyFireActionBinding" class="btn btn-primary btn-small">
-                  Use Same Bindings ({{ firstConfiguredFireAction.bindings.join(', ') }})
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Weapon Switch Action Notice -->
-          <div v-if="isCurrentActionWeaponSwitch" class="fire-action-notice">
-            <div class="fire-action-icon">🔄</div>
-            <div class="fire-action-content">
-              <strong>Important: Weapon Switch Binding</strong>
-              <p>All weapon switch actions (CharacterNextWeapon, TurretNextWeapon) should be bound to the SAME button. This ensures consistent weapon cycling across all contexts.</p>
-              <div v-if="firstConfiguredWeaponSwitchAction && firstConfiguredWeaponSwitchAction.name !== currentAction?.name" class="fire-action-suggestion">
-                <p>✓ You already configured <strong>{{ formatActionName(firstConfiguredWeaponSwitchAction.name) }}</strong> to <strong>{{ firstConfiguredWeaponSwitchAction.bindings.join(', ') }}</strong></p>
-                <button @click="copyWeaponSwitchBinding" class="btn btn-primary btn-small">
-                  Use Same Bindings ({{ firstConfiguredWeaponSwitchAction.bindings.join(', ') }})
+              <div v-if="note.sharedInput && bindingSuggestion" class="fire-action-suggestion">
+                <p>✓ You already configured <strong>{{ formatActionName(bindingSuggestion.name) }}</strong> to <strong>{{ bindingSuggestion.bindings.join(', ') }}</strong></p>
+                <button @click="copySuggestedBinding" class="btn btn-primary btn-small">
+                  Use Same Bindings ({{ bindingSuggestion.bindings.join(', ') }})
                 </button>
               </div>
             </div>

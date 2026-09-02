@@ -9,6 +9,20 @@ declare global {
   }
 }
 
+// Rows listed here are written into the config under a shared action name, which
+// lets one action carry several FilterPresets. Reforger needs this for actions it
+// writes as a single block holding sources with different presets. A row that is
+// not listed keeps its own name and behaves exactly as before.
+const SHARED_ACTION_NAMES = new Map<string, string>([
+  ['HelicopterSightZeroingUp', 'HelicopterSightZeroing'],
+  ['HelicopterSightZeroingDown', 'HelicopterSightZeroing']
+])
+
+function configActionName(action: Omit<Action, 'bindings'>): string {
+  const shared = SHARED_ACTION_NAMES.get(action.name)
+  return shared ? shared : action.name
+}
+
 // Action definitions with sensible FilterPreset defaults and hints
 const ACTIONS: Omit<Action, 'bindings'>[] = [
   { name: 'HelicopterCollectiveIncrease', filterPreset: 'up', hint: 'Increase altitude (raise collective)', hardware: 'throttle', importance: 'critical' },
@@ -26,6 +40,9 @@ const ACTIONS: Omit<Action, 'bindings'>[] = [
   { name: 'HelicopterLightsLandingToggle', filterPreset: 'toggle', hint: 'Landing lights (approach)', hardware: 'switch', importance: 'optional' },
   { name: 'HelicopterEngineStart', filterPreset: 'hold', hint: 'Start engine and rotors', hardware: 'button', importance: 'critical' },
   { name: 'HelicopterEngineStop', filterPreset: 'click', hint: 'Stop engine and rotors', hardware: 'button', importance: 'critical' },
+  { name: 'HelicopterSightDeploy', filterPreset: 'click', hint: 'Deploy or stow the pilot gunsight (gunship variants only)', hardware: 'button', importance: 'optional' },
+  { name: 'HelicopterSightZeroingUp', filterPreset: 'up', hint: 'Raise gunsight zeroing', hardware: 'button', importance: 'optional' },
+  { name: 'HelicopterSightZeroingDown', filterPreset: 'down', hint: 'Lower gunsight zeroing', hardware: 'button', importance: 'optional' },
   { name: 'CharacterFire', filterPreset: 'hold', hint: 'Fire primary weapon (use same trigger as all fire actions)', hardware: 'trigger', importance: 'critical' },
   { name: 'CharacterNextWeapon', filterPreset: 'click', hint: 'Switch to next weapon (use same button as all weapon switch actions)', hardware: 'hat', importance: 'important' },
   { name: 'CharacterNextFireMode', filterPreset: 'click', hint: 'Change fire mode (single/burst/auto)', hardware: 'button', importance: 'important' },
@@ -829,15 +846,24 @@ function trackConfigDownload() {
 function generateConfig(): string {
   let config = 'ActionManager {\n Actions {\n'
 
+  // Rows sharing an action name become one block, so they are grouped up front
+  const grouped = new Map<string, Action[]>()
   state.actions.forEach(action => {
-    if (action.bindings.length > 0) {
-      const inputSourceGUID = generateGUID()
+    if (action.bindings.length === 0) return
+    const name = configActionName(action)
+    const rows = grouped.get(name)
+    if (rows) rows.push(action)
+    else grouped.set(name, [action])
+  })
 
-      config += `  Action ${action.name} {\n`
-      config += `   InputSource InputSourceSum "${inputSourceGUID}" {\n`
-      config += `    Sources {\n`
+  grouped.forEach((rows, actionName) => {
+    const inputSourceGUID = generateGUID()
 
-      // Generate an InputSourceValue for each binding
+    config += `  Action ${actionName} {\n`
+    config += `   InputSource InputSourceSum "${inputSourceGUID}" {\n`
+    config += `    Sources {\n`
+
+    rows.forEach(action => {
       action.bindings.forEach(binding => {
         const inputValueGUID = generateGUID()
         config += `     InputSourceValue "${inputValueGUID}" {\n`
@@ -848,18 +874,18 @@ function generateConfig(): string {
           const filterGUID = generateGUID()
           config += `      Filter InputFilterDown "${filterGUID}" {\n`
           config += `      }\n`
-        } else if (action.filterPreset === 'hold' && (action.name.includes('Engine') || action.name.includes('ADS'))) {
+        } else if (action.filterPreset === 'hold' && (actionName.includes('Engine') || actionName.includes('ADS'))) {
           const filterGUID = generateGUID()
           config += `      Filter InputFilterHold "${filterGUID}" {\n`
-          if (action.name.includes('ADSHold')) {
+          if (actionName.includes('ADSHold')) {
             config += `       HoldDuration -1\n`
           }
           config += `      }\n`
-        } else if (action.name.includes('Reset')) {
+        } else if (actionName.includes('Reset')) {
           const filterGUID = generateGUID()
           config += `      Filter InputFilterSingleClick "${filterGUID}" {\n`
           config += `      }\n`
-        } else if (action.name.includes('EngineStop')) {
+        } else if (actionName.includes('EngineStop')) {
           const filterGUID = generateGUID()
           config += `      Filter InputFilterHoldOnce "${filterGUID}" {\n`
           config += `      }\n`
@@ -867,11 +893,11 @@ function generateConfig(): string {
 
         config += `     }\n`
       })
+    })
 
-      config += `    }\n`
-      config += `   }\n`
-      config += `  }\n`
-    }
+    config += `    }\n`
+    config += `   }\n`
+    config += `  }\n`
   })
 
   config += ' }\n}\n'
@@ -958,31 +984,48 @@ function handleLoadConfig(event: Event) {
   reader.readAsText(file)
 }
 
+// Reads the FilterPreset and Input of every InputSourceValue inside one Action block
+function parseActionSources(actionBody: string): { filterPreset: string; input: string }[] {
+  return actionBody
+    .split('InputSourceValue')
+    .slice(1)
+    .map(source => ({
+      filterPreset: (source.match(/FilterPreset\s+"([^"]+)"/) || ['', ''])[1],
+      input: (source.match(/Input\s+"([^"]+)"/) || ['', ''])[1]
+    }))
+    .filter(source => source.input !== '')
+}
+
 function parseConfig(configText: string) {
   // Clear all existing bindings
   state.actions.forEach(action => action.bindings = [])
+
+  const rowsByActionName = new Map<string, Action[]>()
+  state.actions.forEach(action => {
+    const name = configActionName(action)
+    const rows = rowsByActionName.get(name)
+    if (rows) rows.push(action)
+    else rowsByActionName.set(name, [action])
+  })
 
   // Match each Action block
   const actionBlockRegex = /Action\s+(\w+)\s*\{([\s\S]*?)\n  \}/g
   let actionMatch
 
   while ((actionMatch = actionBlockRegex.exec(configText)) !== null) {
-    const actionName = actionMatch[1]
-    const actionContent = actionMatch[2]
+    const rows = rowsByActionName.get(actionMatch[1])
+    if (!rows) continue
 
-    const action = state.actions.find(a => a.name === actionName)
-    if (action) {
-      // Find all Input entries within this action
-      const inputRegex = /Input\s+"([^"]+)"/g
-      let inputMatch
-
-      while ((inputMatch = inputRegex.exec(actionContent)) !== null) {
-        const input = inputMatch[1]
-        if (!action.bindings.includes(input)) {
-          action.bindings.push(input)
-        }
+    parseActionSources(actionMatch[2]).forEach(source => {
+      // Rows sharing an action name are told apart by their preset. Anything else,
+      // including a config written before a name was shared, goes to the first row,
+      // which is where every input landed before.
+      const match = rows.find(row => row.filterPreset === source.filterPreset)
+      const row = rows.length > 1 && match ? match : rows[0]
+      if (!row.bindings.includes(source.input)) {
+        row.bindings.push(source.input)
       }
-    }
+    })
   }
 }
 

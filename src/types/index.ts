@@ -24,6 +24,13 @@ export type HardwareType =
 
 export type ImportanceLevel = 'critical' | 'important' | 'optional';
 
+export interface ActionNote {
+  names: string[];
+  icon: string;
+  title: string;
+  text: string;
+}
+
 export interface Action {
   name: string;
   filterPreset: FilterPreset;

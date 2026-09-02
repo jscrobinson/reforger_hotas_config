@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted, onUnmounted, watch } from 'vue'
-import type { Action, AppState, GamepadState } from './types'
+import type { Action, ActionNote, AppState, GamepadState } from './types'
 
 // Google Analytics gtag declaration
 declare global {
@@ -15,7 +15,8 @@ declare global {
 // not listed keeps its own name and behaves exactly as before.
 const SHARED_ACTION_NAMES = new Map<string, string>([
   ['HelicopterSightZeroingUp', 'HelicopterSightZeroing'],
-  ['HelicopterSightZeroingDown', 'HelicopterSightZeroing']
+  ['HelicopterSightZeroingDown', 'HelicopterSightZeroing'],
+  ['TurretNextWeaponHold', 'TurretNextWeapon']
 ])
 
 function configActionName(action: Omit<Action, 'bindings'>): string {
@@ -50,7 +51,9 @@ const ACTIONS: Omit<Action, 'bindings'>[] = [
   { name: 'TurretFire', filterPreset: 'hold', hint: 'Fire turret weapon (use same trigger as all fire actions)', hardware: 'trigger', importance: 'important' },
   { name: 'TurretReload', filterPreset: 'click', hint: 'Reload turret weapon', hardware: 'button', importance: 'important' },
   { name: 'TurretNextWeapon', filterPreset: 'click', hint: 'Cycle turret weapons (use same button as all weapon switch actions)', hardware: 'hat', importance: 'important' },
+  { name: 'TurretNextWeaponHold', filterPreset: 'hold', hint: 'Cycle turret weapons (tap to step, hold to cycle left/right/alternating)', hardware: 'button', importance: 'important' },
   { name: 'TurretNextFireMode', filterPreset: 'click', hint: 'Change turret fire mode', hardware: 'button', importance: 'optional' },
+  { name: 'TurretWeaponNextFireMode', filterPreset: 'click', hint: 'Change turret fire mode', hardware: 'button', importance: 'optional' },
   { name: 'TurretADS', filterPreset: 'click', hint: 'Aim down sights (toggle)', hardware: 'button', importance: 'optional' },
   { name: 'TurretADSHold', filterPreset: 'hold', hint: 'Aim down sights (hold)', hardware: 'button', importance: 'optional' },
   { name: 'TurretRotateLeft', filterPreset: 'left', hint: 'Rotate turret left', hardware: 'stick', importance: 'important' },
@@ -222,11 +225,51 @@ const isConfigurationComplete = computed(() => {
   return configuredCount.value === state.actions.length && configuredCount.value > 0
 })
 
+// Guidance shown while one of the listed actions is being bound
+const ACTION_NOTES: ActionNote[] = [
+  {
+    names: ['TurretNextWeapon'],
+    icon: '⚠️',
+    title: 'Outdated, best to skip this one',
+    text: 'Writes TurretNextWeapon with FilterPreset "click", but Reforger uses "hold" for that action. Bound with "click" it fires every frame the button is held, so weapons flick past instead of stepping one at a time. Skip this step, leave it empty and use Turret Next Weapon Hold instead. Never map both to the same button, they write the same action.'
+  },
+  {
+    names: ['TurretNextWeaponHold'],
+    icon: '✅',
+    title: 'Use this instead of the previous step',
+    text: 'Writes the same action as the previous step, TurretNextWeapon, but with FilterPreset "hold" as Reforger expects. Choose this one and leave the previous step empty. Never map both to the same button.'
+  },
+  {
+    names: ['TurretNextWeaponHold', 'TurretWeaponNextFireMode'],
+    icon: '\u{1F4A1}',
+    title: 'Worth knowing',
+    text: 'Reforger binds these two on one button by default (V on a keyboard): a tap changes fire mode, holding cycles weapons. You can do the same, or keep them on separate buttons. Both work.'
+  },
+  {
+    names: ['TurretNextFireMode'],
+    icon: '⚠️',
+    title: 'Outdated, best to skip this one',
+    text: 'TurretNextFireMode is not a name Arma Reforger knows any more, so a binding here does nothing in game. The row is kept so older configs still load. Skip this step, leave it empty and use Turret Weapon Next Fire Mode instead.'
+  },
+  {
+    names: ['TurretWeaponNextFireMode'],
+    icon: '✅',
+    title: 'Use this instead of the previous step',
+    text: 'Current name for changing the turret fire mode. The previous step writes TurretNextFireMode, which the game no longer knows.'
+  }
+]
+
+const currentActionNotes = computed(() => {
+  const action = currentAction.value
+  if (!action) return []
+  return ACTION_NOTES.filter(note => note.names.includes(action.name))
+})
+
 // Fire action helpers
 const FIRE_ACTION_NAMES = ['CharacterFire', 'TurretFire', 'HelicopterFire', 'VehicleFire']
 
 // Weapon switching action helpers
-const WEAPON_SWITCH_ACTION_NAMES = ['CharacterNextWeapon', 'TurretNextWeapon']
+const WEAPON_SWITCH_ACTION_NAMES = ['CharacterNextWeapon', 'TurretNextWeaponHold']
 
 const isCurrentActionFireAction = computed(() => {
   if (!currentAction.value) return false
@@ -1435,6 +1478,15 @@ onUnmounted(() => {
           </div>
           <div class="action-prompt">Press any button or move any axis</div>
           <div class="action-hint">Use ↑↓ arrows or click to navigate actions • Enable HAT Mode for difficult HAT switches</div>
+
+          <!-- Guidance for the current action -->
+          <div v-for="note in currentActionNotes" :key="note.title" class="fire-action-notice">
+            <div class="fire-action-icon">{{ note.icon }}</div>
+            <div class="fire-action-content">
+              <strong>{{ note.title }}</strong>
+              <p>{{ note.text }}</p>
+            </div>
+          </div>
 
           <!-- Fire Action Notice -->
           <div v-if="isCurrentActionFireAction" class="fire-action-notice">

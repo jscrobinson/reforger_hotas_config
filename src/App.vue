@@ -1,12 +1,27 @@
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted, onUnmounted, watch } from 'vue'
-import type { Action, AppState, GamepadState } from './types'
+import type { Action, ActionNote, AppState, GamepadState } from './types'
 
 // Google Analytics gtag declaration
 declare global {
   interface Window {
     gtag?: (command: string, ...args: any[]) => void
   }
+}
+
+// Rows listed here are written into the config under a shared action name, which
+// lets one action carry several FilterPresets. Reforger needs this for actions it
+// writes as a single block holding sources with different presets. A row that is
+// not listed keeps its own name and behaves exactly as before.
+const SHARED_ACTION_NAMES = new Map<string, string>([
+  ['HelicopterSightZeroingUp', 'HelicopterSightZeroing'],
+  ['HelicopterSightZeroingDown', 'HelicopterSightZeroing'],
+  ['TurretNextWeaponHold', 'TurretNextWeapon']
+])
+
+function configActionName(action: Omit<Action, 'bindings'>): string {
+  const shared = SHARED_ACTION_NAMES.get(action.name)
+  return shared ? shared : action.name
 }
 
 // Action definitions with sensible FilterPreset defaults and hints
@@ -26,6 +41,9 @@ const ACTIONS: Omit<Action, 'bindings'>[] = [
   { name: 'HelicopterLightsLandingToggle', filterPreset: 'toggle', hint: 'Landing lights (approach)', hardware: 'switch', importance: 'optional' },
   { name: 'HelicopterEngineStart', filterPreset: 'hold', hint: 'Start engine and rotors', hardware: 'button', importance: 'critical' },
   { name: 'HelicopterEngineStop', filterPreset: 'click', hint: 'Stop engine and rotors', hardware: 'button', importance: 'critical' },
+  { name: 'HelicopterSightDeploy', filterPreset: 'click', hint: 'Deploy or stow the pilot gunsight (gunship variants only)', hardware: 'button', importance: 'optional' },
+  { name: 'HelicopterSightZeroingUp', filterPreset: 'up', hint: 'Raise gunsight zeroing', hardware: 'button', importance: 'optional' },
+  { name: 'HelicopterSightZeroingDown', filterPreset: 'down', hint: 'Lower gunsight zeroing', hardware: 'button', importance: 'optional' },
   { name: 'CharacterFire', filterPreset: 'hold', hint: 'Fire primary weapon (use same trigger as all fire actions)', hardware: 'trigger', importance: 'critical' },
   { name: 'CharacterNextWeapon', filterPreset: 'click', hint: 'Switch to next weapon (use same button as all weapon switch actions)', hardware: 'hat', importance: 'important' },
   { name: 'CharacterNextFireMode', filterPreset: 'click', hint: 'Change fire mode (single/burst/auto)', hardware: 'button', importance: 'important' },
@@ -33,7 +51,9 @@ const ACTIONS: Omit<Action, 'bindings'>[] = [
   { name: 'TurretFire', filterPreset: 'hold', hint: 'Fire turret weapon (use same trigger as all fire actions)', hardware: 'trigger', importance: 'important' },
   { name: 'TurretReload', filterPreset: 'click', hint: 'Reload turret weapon', hardware: 'button', importance: 'important' },
   { name: 'TurretNextWeapon', filterPreset: 'click', hint: 'Cycle turret weapons (use same button as all weapon switch actions)', hardware: 'hat', importance: 'important' },
+  { name: 'TurretNextWeaponHold', filterPreset: 'hold', hint: 'Cycle turret weapons (tap to step, hold to cycle left/right/alternating)', hardware: 'button', importance: 'important' },
   { name: 'TurretNextFireMode', filterPreset: 'click', hint: 'Change turret fire mode', hardware: 'button', importance: 'optional' },
+  { name: 'TurretWeaponNextFireMode', filterPreset: 'click', hint: 'Change turret fire mode', hardware: 'button', importance: 'optional' },
   { name: 'TurretADS', filterPreset: 'click', hint: 'Aim down sights (toggle)', hardware: 'button', importance: 'optional' },
   { name: 'TurretADSHold', filterPreset: 'hold', hint: 'Aim down sights (hold)', hardware: 'button', importance: 'optional' },
   { name: 'TurretRotateLeft', filterPreset: 'left', hint: 'Rotate turret left', hardware: 'stick', importance: 'important' },
@@ -205,41 +225,77 @@ const isConfigurationComplete = computed(() => {
   return configuredCount.value === state.actions.length && configuredCount.value > 0
 })
 
-// Fire action helpers
-const FIRE_ACTION_NAMES = ['CharacterFire', 'TurretFire', 'HelicopterFire', 'VehicleFire']
+// Guidance shown while one of the listed actions is being bound. A note marked
+// sharedInput also offers to copy the binding already given to another action
+// it lists, because those actions work best on one input.
+const ACTION_NOTES: ActionNote[] = [
+  {
+    names: ['TurretNextWeapon'],
+    icon: '⚠️',
+    title: 'Outdated, best to skip this one',
+    text: 'Writes TurretNextWeapon with FilterPreset "click", but Reforger uses "hold" for that action. Bound with "click" it fires every frame the button is held, so weapons flick past instead of stepping one at a time. Skip this step, leave it empty and use Turret Next Weapon Hold instead. Never map both to the same button, they write the same action.',
+    sharedInput: false
+  },
+  {
+    names: ['TurretNextWeaponHold'],
+    icon: '✅',
+    title: 'Use this instead of the previous step',
+    text: 'Writes the same action as the previous step, TurretNextWeapon, but with FilterPreset "hold" as Reforger expects. Choose this one and leave the previous step empty. Never map both to the same button.',
+    sharedInput: false
+  },
+  {
+    names: ['TurretNextFireMode'],
+    icon: '⚠️',
+    title: 'Outdated, best to skip this one',
+    text: 'TurretNextFireMode is not a name Arma Reforger knows any more, so a binding here does nothing in game. The row is kept so older configs still load. Skip this step, leave it empty and use Turret Weapon Next Fire Mode instead.',
+    sharedInput: false
+  },
+  {
+    names: ['TurretWeaponNextFireMode'],
+    icon: '✅',
+    title: 'Use this instead of the previous step',
+    text: 'Current name for changing the turret fire mode. The previous step writes TurretNextFireMode, which the game no longer knows.',
+    sharedInput: false
+  },
+  {
+    names: ['TurretNextWeaponHold', 'TurretWeaponNextFireMode'],
+    icon: '\u{1F4A1}',
+    title: 'Worth knowing',
+    text: 'Reforger binds these two on one button by default (V on a keyboard): a tap changes fire mode, holding cycles weapons. You can do the same, or keep them on separate buttons. Both work.',
+    sharedInput: false
+  },
+  {
+    names: ['CharacterFire', 'TurretFire', 'HelicopterFire', 'VehicleFire'],
+    icon: '\u{1F3AF}',
+    title: 'Important: Fire Button Binding',
+    text: 'All fire actions (CharacterFire, TurretFire, HelicopterFire, VehicleFire) should be bound to the SAME trigger button. This ensures consistent firing across all vehicle types and on-foot combat.',
+    sharedInput: true
+  },
+  {
+    names: ['CharacterNextWeapon', 'TurretNextWeaponHold'],
+    icon: '\u{1F504}',
+    title: 'Important: Weapon Switch Binding',
+    text: 'All weapon switch actions (CharacterNextWeapon, TurretNextWeapon) should be bound to the SAME button. This ensures consistent weapon cycling across all contexts.',
+    sharedInput: true
+  }
+]
 
-// Weapon switching action helpers
-const WEAPON_SWITCH_ACTION_NAMES = ['CharacterNextWeapon', 'TurretNextWeapon']
-
-const isCurrentActionFireAction = computed(() => {
-  if (!currentAction.value) return false
-  return FIRE_ACTION_NAMES.includes(currentAction.value.name)
+const currentActionNotes = computed(() => {
+  const action = currentAction.value
+  if (!action) return []
+  return ACTION_NOTES.filter(note => note.names.includes(action.name))
 })
 
-const configuredFireActions = computed(() => {
-  return state.actions.filter(action =>
-    FIRE_ACTION_NAMES.includes(action.name) && action.bindings.length > 0
+// Another action from a sharedInput note that is already bound, if it is not
+// the action being configured right now
+const bindingSuggestion = computed(() => {
+  const action = currentAction.value
+  const note = currentActionNotes.value.find(candidate => candidate.sharedInput)
+  if (!action || !note) return null
+  const configured = state.actions.find(candidate =>
+    note.names.includes(candidate.name) && candidate.bindings.length > 0
   )
-})
-
-const firstConfiguredFireAction = computed(() => {
-  return configuredFireActions.value.length > 0 ? configuredFireActions.value[0] : null
-})
-
-// Weapon switching computed properties
-const isCurrentActionWeaponSwitch = computed(() => {
-  if (!currentAction.value) return false
-  return WEAPON_SWITCH_ACTION_NAMES.includes(currentAction.value.name)
-})
-
-const configuredWeaponSwitchActions = computed(() => {
-  return state.actions.filter(action =>
-    WEAPON_SWITCH_ACTION_NAMES.includes(action.name) && action.bindings.length > 0
-  )
-})
-
-const firstConfiguredWeaponSwitchAction = computed(() => {
-  return configuredWeaponSwitchActions.value.length > 0 ? configuredWeaponSwitchActions.value[0] : null
+  return configured && configured.name !== action.name ? configured : null
 })
 
 // Methods
@@ -369,30 +425,18 @@ function clearCurrentActionBinding() {
   }
 }
 
-function copyFireActionBinding() {
-  if (currentAction.value && firstConfiguredFireAction.value) {
-    currentAction.value.bindings = [...firstConfiguredFireAction.value.bindings]
-    state.pendingInput = null
-    state.inputCooldown = true
-    setTimeout(() => {
-      state.inputCooldown = false
-      resetGamepadBaseline()
-      nextAction()
-    }, 300)
-  }
-}
+function copySuggestedBinding() {
+  const source = bindingSuggestion.value
+  if (!currentAction.value || !source) return
 
-function copyWeaponSwitchBinding() {
-  if (currentAction.value && firstConfiguredWeaponSwitchAction.value) {
-    currentAction.value.bindings = [...firstConfiguredWeaponSwitchAction.value.bindings]
-    state.pendingInput = null
-    state.inputCooldown = true
-    setTimeout(() => {
-      state.inputCooldown = false
-      resetGamepadBaseline()
-      nextAction()
-    }, 300)
-  }
+  currentAction.value.bindings = [...source.bindings]
+  state.pendingInput = null
+  state.inputCooldown = true
+  setTimeout(() => {
+    state.inputCooldown = false
+    resetGamepadBaseline()
+    nextAction()
+  }, 300)
 }
 
 function nextAction() {
@@ -829,15 +873,24 @@ function trackConfigDownload() {
 function generateConfig(): string {
   let config = 'ActionManager {\n Actions {\n'
 
+  // Rows sharing an action name become one block, so they are grouped up front
+  const grouped = new Map<string, Action[]>()
   state.actions.forEach(action => {
-    if (action.bindings.length > 0) {
-      const inputSourceGUID = generateGUID()
+    if (action.bindings.length === 0) return
+    const name = configActionName(action)
+    const rows = grouped.get(name)
+    if (rows) rows.push(action)
+    else grouped.set(name, [action])
+  })
 
-      config += `  Action ${action.name} {\n`
-      config += `   InputSource InputSourceSum "${inputSourceGUID}" {\n`
-      config += `    Sources {\n`
+  grouped.forEach((rows, actionName) => {
+    const inputSourceGUID = generateGUID()
 
-      // Generate an InputSourceValue for each binding
+    config += `  Action ${actionName} {\n`
+    config += `   InputSource InputSourceSum "${inputSourceGUID}" {\n`
+    config += `    Sources {\n`
+
+    rows.forEach(action => {
       action.bindings.forEach(binding => {
         const inputValueGUID = generateGUID()
         config += `     InputSourceValue "${inputValueGUID}" {\n`
@@ -848,18 +901,18 @@ function generateConfig(): string {
           const filterGUID = generateGUID()
           config += `      Filter InputFilterDown "${filterGUID}" {\n`
           config += `      }\n`
-        } else if (action.filterPreset === 'hold' && (action.name.includes('Engine') || action.name.includes('ADS'))) {
+        } else if (action.filterPreset === 'hold' && (actionName.includes('Engine') || actionName.includes('ADS'))) {
           const filterGUID = generateGUID()
           config += `      Filter InputFilterHold "${filterGUID}" {\n`
-          if (action.name.includes('ADSHold')) {
+          if (actionName.includes('ADSHold')) {
             config += `       HoldDuration -1\n`
           }
           config += `      }\n`
-        } else if (action.name.includes('Reset')) {
+        } else if (actionName.includes('Reset')) {
           const filterGUID = generateGUID()
           config += `      Filter InputFilterSingleClick "${filterGUID}" {\n`
           config += `      }\n`
-        } else if (action.name.includes('EngineStop')) {
+        } else if (actionName.includes('EngineStop')) {
           const filterGUID = generateGUID()
           config += `      Filter InputFilterHoldOnce "${filterGUID}" {\n`
           config += `      }\n`
@@ -867,11 +920,11 @@ function generateConfig(): string {
 
         config += `     }\n`
       })
+    })
 
-      config += `    }\n`
-      config += `   }\n`
-      config += `  }\n`
-    }
+    config += `    }\n`
+    config += `   }\n`
+    config += `  }\n`
   })
 
   config += ' }\n}\n'
@@ -958,31 +1011,48 @@ function handleLoadConfig(event: Event) {
   reader.readAsText(file)
 }
 
+// Reads the FilterPreset and Input of every InputSourceValue inside one Action block
+function parseActionSources(actionBody: string): { filterPreset: string; input: string }[] {
+  return actionBody
+    .split('InputSourceValue')
+    .slice(1)
+    .map(source => ({
+      filterPreset: (source.match(/FilterPreset\s+"([^"]+)"/) || ['', ''])[1],
+      input: (source.match(/Input\s+"([^"]+)"/) || ['', ''])[1]
+    }))
+    .filter(source => source.input !== '')
+}
+
 function parseConfig(configText: string) {
   // Clear all existing bindings
   state.actions.forEach(action => action.bindings = [])
+
+  const rowsByActionName = new Map<string, Action[]>()
+  state.actions.forEach(action => {
+    const name = configActionName(action)
+    const rows = rowsByActionName.get(name)
+    if (rows) rows.push(action)
+    else rowsByActionName.set(name, [action])
+  })
 
   // Match each Action block
   const actionBlockRegex = /Action\s+(\w+)\s*\{([\s\S]*?)\n  \}/g
   let actionMatch
 
   while ((actionMatch = actionBlockRegex.exec(configText)) !== null) {
-    const actionName = actionMatch[1]
-    const actionContent = actionMatch[2]
+    const rows = rowsByActionName.get(actionMatch[1])
+    if (!rows) continue
 
-    const action = state.actions.find(a => a.name === actionName)
-    if (action) {
-      // Find all Input entries within this action
-      const inputRegex = /Input\s+"([^"]+)"/g
-      let inputMatch
-
-      while ((inputMatch = inputRegex.exec(actionContent)) !== null) {
-        const input = inputMatch[1]
-        if (!action.bindings.includes(input)) {
-          action.bindings.push(input)
-        }
+    parseActionSources(actionMatch[2]).forEach(source => {
+      // Rows sharing an action name are told apart by their preset. Anything else,
+      // including a config written before a name was shared, goes to the first row,
+      // which is where every input landed before.
+      const match = rows.find(row => row.filterPreset === source.filterPreset)
+      const row = rows.length > 1 && match ? match : rows[0]
+      if (!row.bindings.includes(source.input)) {
+        row.bindings.push(source.input)
       }
-    }
+    })
   }
 }
 
@@ -1393,31 +1463,16 @@ onUnmounted(() => {
           <div class="action-prompt">Press any button or move any axis</div>
           <div class="action-hint">Use ↑↓ arrows or click to navigate actions • Enable HAT Mode for difficult HAT switches</div>
 
-          <!-- Fire Action Notice -->
-          <div v-if="isCurrentActionFireAction" class="fire-action-notice">
-            <div class="fire-action-icon">🎯</div>
+          <!-- Guidance for the current action -->
+          <div v-for="note in currentActionNotes" :key="note.title" class="fire-action-notice">
+            <div class="fire-action-icon">{{ note.icon }}</div>
             <div class="fire-action-content">
-              <strong>Important: Fire Button Binding</strong>
-              <p>All fire actions (CharacterFire, TurretFire, HelicopterFire, VehicleFire) should be bound to the SAME trigger button. This ensures consistent firing across all vehicle types and on-foot combat.</p>
-              <div v-if="firstConfiguredFireAction && firstConfiguredFireAction.name !== currentAction?.name" class="fire-action-suggestion">
-                <p>✓ You already configured <strong>{{ formatActionName(firstConfiguredFireAction.name) }}</strong> to <strong>{{ firstConfiguredFireAction.bindings.join(', ') }}</strong></p>
-                <button @click="copyFireActionBinding" class="btn btn-primary btn-small">
-                  Use Same Bindings ({{ firstConfiguredFireAction.bindings.join(', ') }})
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Weapon Switch Action Notice -->
-          <div v-if="isCurrentActionWeaponSwitch" class="fire-action-notice">
-            <div class="fire-action-icon">🔄</div>
-            <div class="fire-action-content">
-              <strong>Important: Weapon Switch Binding</strong>
-              <p>All weapon switch actions (CharacterNextWeapon, TurretNextWeapon) should be bound to the SAME button. This ensures consistent weapon cycling across all contexts.</p>
-              <div v-if="firstConfiguredWeaponSwitchAction && firstConfiguredWeaponSwitchAction.name !== currentAction?.name" class="fire-action-suggestion">
-                <p>✓ You already configured <strong>{{ formatActionName(firstConfiguredWeaponSwitchAction.name) }}</strong> to <strong>{{ firstConfiguredWeaponSwitchAction.bindings.join(', ') }}</strong></p>
-                <button @click="copyWeaponSwitchBinding" class="btn btn-primary btn-small">
-                  Use Same Bindings ({{ firstConfiguredWeaponSwitchAction.bindings.join(', ') }})
+              <strong>{{ note.title }}</strong>
+              <p>{{ note.text }}</p>
+              <div v-if="note.sharedInput && bindingSuggestion" class="fire-action-suggestion">
+                <p>✓ You already configured <strong>{{ formatActionName(bindingSuggestion.name) }}</strong> to <strong>{{ bindingSuggestion.bindings.join(', ') }}</strong></p>
+                <button @click="copySuggestedBinding" class="btn btn-primary btn-small">
+                  Use Same Bindings ({{ bindingSuggestion.bindings.join(', ') }})
                 </button>
               </div>
             </div>

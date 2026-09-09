@@ -110,6 +110,9 @@ interface AxisCalibration {
   }
 }
 
+// Warm-up polls per gamepad before treating button/axis changes as real input
+const initFrameCount: Record<number, number> = {}
+
 // State
 const state = reactive<AppState>({
   actions: ACTIONS.map(action => ({ ...action, bindings: [] })),
@@ -534,10 +537,25 @@ function detectTestModeInput(gamepad: Gamepad, gamepadIndex: number) {
       buttons: gamepad.buttons.map(b => ({ pressed: b.pressed })),
       axes: [...gamepad.axes]
     }
+    initFrameCount[gamepadIndex] = 0
+    return
+  }
+
+  if ((initFrameCount[gamepadIndex] ?? 0) < 3) {
+    initFrameCount[gamepadIndex] = (initFrameCount[gamepadIndex] ?? 0) + 1
+    state.previousGamepadState[gamepadIndex] = {
+      buttons: gamepad.buttons.map(b => ({ pressed: b.pressed })),
+      axes: [...gamepad.axes]
+    }
     return
   }
 
   const prevState = state.previousGamepadState[gamepadIndex]
+
+  state.previousGamepadState[gamepadIndex] = {
+    buttons: gamepad.buttons.map(b => ({ pressed: b.pressed })),
+    axes: [...gamepad.axes]
+  }
 
   // Check buttons
   for (let i = 0; i < gamepad.buttons.length; i++) {
@@ -629,11 +647,6 @@ function detectTestModeInput(gamepad: Gamepad, gamepadIndex: number) {
       }
     }
   }
-
-  state.previousGamepadState[gamepadIndex] = {
-    buttons: gamepad.buttons.map(b => ({ pressed: b.pressed })),
-    axes: [...gamepad.axes]
-  }
 }
 
 function confirmInput() {
@@ -679,10 +692,25 @@ function detectInput(gamepad: Gamepad, gamepadIndex: number) {
       buttons: gamepad.buttons.map(b => ({ pressed: b.pressed })),
       axes: [...gamepad.axes]
     }
+    initFrameCount[gamepadIndex] = 0
+    return
+  }
+
+  if ((initFrameCount[gamepadIndex] ?? 0) < 3) {
+    initFrameCount[gamepadIndex] = (initFrameCount[gamepadIndex] ?? 0) + 1
+    state.previousGamepadState[gamepadIndex] = {
+      buttons: gamepad.buttons.map(b => ({ pressed: b.pressed })),
+      axes: [...gamepad.axes]
+    }
     return
   }
 
   const prevState = state.previousGamepadState[gamepadIndex]
+
+  state.previousGamepadState[gamepadIndex] = {
+    buttons: gamepad.buttons.map(b => ({ pressed: b.pressed })),
+    axes: [...gamepad.axes]
+  }
 
   // Check buttons
   for (let i = 0; i < gamepad.buttons.length; i++) {
@@ -753,11 +781,6 @@ function detectInput(gamepad: Gamepad, gamepadIndex: number) {
         return
       }
     }
-  }
-
-  state.previousGamepadState[gamepadIndex] = {
-    buttons: gamepad.buttons.map(b => ({ pressed: b.pressed })),
-    axes: [...gamepad.axes]
   }
 }
 

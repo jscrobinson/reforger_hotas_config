@@ -95,8 +95,8 @@ const WCS_ACTIONS: Omit<Action, 'bindings'>[] = [
   { name: 'WCS_Armament_VehicleAim', filterPreset: 'hold', hint: 'Vehicle aim mode', hardware: 'button', importance: 'optional' },
   { name: 'WCS_Armament_CycleWeaponFireMode', filterPreset: 'click', hint: 'Cycle weapon fire mode', hardware: 'button', importance: 'optional' },
   { name: 'WCS_Armament_ActivateLock', filterPreset: 'hold', hint: 'Activate weapon lock', hardware: 'button', importance: 'optional' },
-  // FilterPreset unconfirmed: reports say click, press and hold
-  { name: 'WCS_Armament_ConfirmLock', filterPreset: 'click', hint: 'Confirm weapon lock', hardware: 'button', importance: 'optional' },
+  // Name and FilterPreset (pressed) confirmed by the maintainer
+  { name: 'WCS_Armament_ConfirmLock', filterPreset: 'pressed', hint: 'Confirm weapon lock', hardware: 'button', importance: 'optional' },
   { name: 'WCS_Armament_DeploySmoke', filterPreset: 'hold', hint: 'Deploy smoke (countermeasure)', hardware: 'button', importance: 'optional' },
   { name: 'WCS_Armament_RadarToggle', filterPreset: 'click', hint: 'Toggle radar', hardware: 'button', importance: 'optional' },
   { name: 'WCS_Armament_FireContinuousSmokeDispenser', filterPreset: 'hold', hint: 'Fire continuous smoke dispenser', hardware: 'button', importance: 'optional' },

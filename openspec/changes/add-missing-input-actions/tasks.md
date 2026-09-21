@@ -1,6 +1,6 @@
 ## 1. Verify names and presets
 
-- [ ] 1.1 Check `VONDirect` spelling and `WCS_Armament_ConfirmLock` FilterPreset against a real in-game config (rebind the key in game, read the saved `InputUserSettings`); record the result in a comment on the new rows (`VONDirect` spelling and `WCS_Armament_ConfirmLock` name confirmed by the maintainer; `WCS_Armament_ConfirmLock` FilterPreset still open)
+- [x] 1.1 Check `VONDirect` spelling and `WCS_Armament_ConfirmLock` FilterPreset against a real in-game config (rebind the key in game, read the saved `InputUserSettings`); record the result in a comment on the new rows (confirmed by the maintainer: `VONDirect` spelling, `WCS_Armament_ConfirmLock` name and FilterPreset `pressed`)
 - [x] 1.2 Check whether the ripple-quantity action is `TurretNextRippleQuantity` or `TurretWeaponNextRippleQuantity` and note the answer in the issue (confirmed by the maintainer: `TurretWeaponNextRippleQuantity`, the tool's current name)
 
 ## 2. Add the actions

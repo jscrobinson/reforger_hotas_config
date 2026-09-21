@@ -64,6 +64,9 @@ const ACTIONS: Omit<Action, 'bindings'>[] = [
   { name: 'TurretAimRight', filterPreset: 'right', hint: 'Fine aim right', hardware: 'stick', importance: 'optional' },
   { name: 'HelicopterFire', filterPreset: 'hold', hint: 'Fire heli weapon (use same trigger as all fire actions)', hardware: 'trigger', importance: 'important' },
   { name: 'VehicleFire', filterPreset: 'hold', hint: 'Fire vehicle weapon (use same trigger as all fire actions)', hardware: 'trigger', importance: 'important' },
+  // Name and preset of VehicleNextWeapon, SwitchCameraType and VONDirect come from user reports, not yet checked in game
+  { name: 'VehicleNextWeapon', filterPreset: 'click', hint: 'Cycle pilot/vehicle weapons (helicopters and WCS vehicles)', hardware: 'button', importance: 'important' },
+  { name: 'SwitchCameraType', filterPreset: 'click', hint: 'Toggle third-person view', hardware: 'button', importance: 'optional' },
   { name: 'WeaponToggleSightsIllumination', filterPreset: 'click', hint: 'Toggle reticle illumination', hardware: 'button', importance: 'optional' },
   { name: 'WeaponSwitchOptics', filterPreset: 'click', hint: 'Change zoom/magnification', hardware: 'button', importance: 'important' },
   { name: 'FocusToggle', filterPreset: 'click', hint: 'Toggle focused aim/scope', hardware: 'button', importance: 'optional' },
@@ -73,7 +76,8 @@ const ACTIONS: Omit<Action, 'bindings'>[] = [
   { name: 'FreelookDown', filterPreset: 'down', hint: 'Look down', hardware: 'hat', importance: 'optional' },
   { name: 'FreelookLeft', filterPreset: 'left', hint: 'Look left', hardware: 'hat', importance: 'optional' },
   { name: 'FreelookRight', filterPreset: 'right', hint: 'Look right', hardware: 'hat', importance: 'optional' },
-  { name: 'VONDirectToggle', filterPreset: 'click', hint: 'Toggle voice chat (push-to-talk)', hardware: 'button', importance: 'important' },
+  { name: 'VONDirect', filterPreset: 'hold', hint: 'Proximity voice chat, active while the button is held (push-to-talk)', hardware: 'button', importance: 'important' },
+  { name: 'VONDirectToggle', filterPreset: 'click', hint: 'Toggle proximity voice chat on and off (not push-to-talk)', hardware: 'button', importance: 'optional' },
   { name: 'VONChannel', filterPreset: 'hold', hint: 'Hold to talk on radio channel', hardware: 'button', importance: 'important' },
   { name: 'GadgetMap', filterPreset: 'select', hint: 'Open/close map', hardware: 'button', importance: 'important' },
   { name: 'PerformAction', filterPreset: 'pressed', hint: 'Context action (interact, reload, etc.)', hardware: 'button', importance: 'important' },
@@ -91,6 +95,8 @@ const WCS_ACTIONS: Omit<Action, 'bindings'>[] = [
   { name: 'WCS_Armament_VehicleAim', filterPreset: 'hold', hint: 'Vehicle aim mode', hardware: 'button', importance: 'optional' },
   { name: 'WCS_Armament_CycleWeaponFireMode', filterPreset: 'click', hint: 'Cycle weapon fire mode', hardware: 'button', importance: 'optional' },
   { name: 'WCS_Armament_ActivateLock', filterPreset: 'hold', hint: 'Activate weapon lock', hardware: 'button', importance: 'optional' },
+  // FilterPreset unconfirmed: reports say click, press and hold
+  { name: 'WCS_Armament_ConfirmLock', filterPreset: 'click', hint: 'Confirm weapon lock', hardware: 'button', importance: 'optional' },
   { name: 'WCS_Armament_DeploySmoke', filterPreset: 'hold', hint: 'Deploy smoke (countermeasure)', hardware: 'button', importance: 'optional' },
   { name: 'WCS_Armament_RadarToggle', filterPreset: 'click', hint: 'Toggle radar', hardware: 'button', importance: 'optional' },
   { name: 'WCS_Armament_FireContinuousSmokeDispenser', filterPreset: 'hold', hint: 'Fire continuous smoke dispenser', hardware: 'button', importance: 'optional' },

@@ -5,7 +5,7 @@
 
 ## 2. Add the actions
 
-- [ ] 2.1 Add `VehicleNextWeapon`, `SwitchCameraType` and `VONDirect` to `ACTIONS` in `src/App.vue`; verify with `npm run build`
+- [x] 2.1 Add `VehicleNextWeapon`, `SwitchCameraType` and `VONDirect` to `ACTIONS` in `src/App.vue`; verify with `npm run build`
 - [ ] 2.2 Add `WCS_Armament_ConfirmLock` to `WCS_ACTIONS`; verify it appears only when WCS actions are ticked
 - [ ] 2.3 Correct the `VONDirectToggle` hint; verify the wording in the browser
 - [ ] 2.4 If 1.2 shows the name is wrong, rename the ripple-quantity row and map the old name on import; verify an old config still loads

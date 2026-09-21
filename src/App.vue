@@ -64,7 +64,7 @@ const ACTIONS: Omit<Action, 'bindings'>[] = [
   { name: 'TurretAimRight', filterPreset: 'right', hint: 'Fine aim right', hardware: 'stick', importance: 'optional' },
   { name: 'HelicopterFire', filterPreset: 'hold', hint: 'Fire heli weapon (use same trigger as all fire actions)', hardware: 'trigger', importance: 'important' },
   { name: 'VehicleFire', filterPreset: 'hold', hint: 'Fire vehicle weapon (use same trigger as all fire actions)', hardware: 'trigger', importance: 'important' },
-  // VONDirect spelling confirmed by the maintainer. VehicleNextWeapon and SwitchCameraType come from user reports, not yet checked in game
+  // VehicleNextWeapon, SwitchCameraType and VONDirect confirmed by the maintainer
   { name: 'VehicleNextWeapon', filterPreset: 'click', hint: 'Cycle pilot/vehicle weapons (helicopters and WCS vehicles)', hardware: 'button', importance: 'important' },
   { name: 'SwitchCameraType', filterPreset: 'click', hint: 'Toggle third-person view', hardware: 'button', importance: 'optional' },
   { name: 'WeaponToggleSightsIllumination', filterPreset: 'click', hint: 'Toggle reticle illumination', hardware: 'button', importance: 'optional' },

@@ -1,0 +1,39 @@
+schema: spec-driven
+
+# Project context (optional)
+# This is shown to AI when creating artifacts.
+context: |
+  Project: Arma Reforger HOTAS Configurator (https://hotas.deltafarce.win).
+  A browser-based tool that reads joysticks/HOTAS via the Gamepad API, walks the
+  user through binding each game action, and generates an Arma Reforger
+  customInputConfig .conf file for download.
+  Tech stack: Vue 3 + TypeScript + Vite (single-page app; most logic lives in
+  src/App.vue, shared types in src/types/index.ts). No backend.
+  Domain: Arma Reforger input manager (InputSource GUIDs, FilterPresets,
+  joystick0/joystick1 naming). Some WCS mod action names are speculative and
+  need community confirmation.
+  Feedback channels: Discord (discord.deltafarce.win) and GitHub issues.
+  Build check: `npm run build` (vue-tsc + vite build); there is no test suite.
+  Commits: short imperative subject lines.
+
+# Per-artifact rules (optional)
+# Add custom rules for specific artifacts.
+# Example:
+#   rules:
+#     proposal:
+#       - Keep proposals under 500 words
+#       - Always include a "Non-goals" section
+#     tasks:
+#       - Break tasks into chunks of max 2 hours
+
+# Per-operation guidance (optional)
+# Add advisory guidance for how apply and archive work should be conducted.
+# This is separate from artifact rules above.
+# Example:
+#   operations:
+#     apply:
+#       guidance:
+#         - Keep test summaries concise
+#     archive:
+#       guidance:
+#         - Summarize the archive outcome before finishing

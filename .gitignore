@@ -22,3 +22,4 @@ wrangler.jsonc.backup
 # Test files
 *.test.conf
 test_*.conf
+.secret
